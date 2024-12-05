@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدل زبانی هوش مصنوعی تامین</title>
+    <style>
+        body {
+            font-family: 'Vazir', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+            background-color: #fff;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .user {
+            text-align: right;
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot {
+            text-align: left;
+            background-color: #e9ecef;
+            color: #333;
+            align-self: flex-start;
+        }
+        #input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #fff;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        #input-text {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 600px) {
+            #input-container {
+                flex-direction: column;
+            }
+            #input-text {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="chat-container"></div>
+    <div id="input-container">
+        <input type="text" id="input-text" placeholder="پیام خود را بنویسید..." />
+        <button id="send-button">ارسال</button>
+    </div>
+
+    <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
+
+        const client = await Client.connect("https://71bf507d2731ca29d7.gradio.live/");
+
+        const chatContainer = document.getElementById('chat-container');
+        const inputText = document.getElementById('input-text');
+        const sendButton = document.getElementById('send-button');
+
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userMessage = inputText.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, 'user');
+            inputText.value = '';
+
+            try {
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
+                });
+
+                const botResponse = result.data[0]; // Assuming the response is in the first element of the result data
+                addMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("An error occurred:", error);
+                addMessage("خطا رخ داد. لطفاً مجدداً تلاش کنید.", 'bot');
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        inputText.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
