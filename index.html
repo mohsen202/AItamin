@@ -14,6 +14,29 @@
             height: 100vh;
             background-color: #f4f4f4;
         }
+        #chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 0 0 10px 10px;
+        }
+        #ai-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: white;
+            background-image: url('https://example.com/ai-avatar.png'); /* Replace with your AI avatar URL */
+            background-size: cover;
+            background-position: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
         #chat-container {
             flex: 1;
             padding: 20px;
@@ -83,6 +106,10 @@
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+    <div id="chat-header">
+        <div id="ai-avatar"></div>
+        <h2 style="margin-left: 20px;">مدل زبانی هوش مصنوعی تامین</h2>
+    </div>
     <div id="chat-container"></div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="پیام خود را بنویسید..." />
@@ -92,7 +119,7 @@
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-        const client = await Client.connect("https://b605583ecb2d0cfb1d.gradio.live/");
+        const client = await Client.connect("https://8c6ab870bce6c75656.gradio.live/");
 
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
