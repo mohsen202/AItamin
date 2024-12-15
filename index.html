@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدل زبانی هوش مصنوعی تامین</title>
+    <title>  اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</title>
     <style>
         body {
             font-family: 'Vazir', sans-serif;
@@ -28,7 +28,7 @@
             height: 100px;
             border-radius: 50%;
             background-color: white;
-            background-image: url('https://s32.picofile.com/file/8481217192/2.png'); /* Replace with your AI avatar URL */
+            background-image: url('https://s32.picofile.com/file/8481217200/3.png'); /* Replace with your AI avatar URL */
             background-size: cover;
             background-position: center;
             animation: pulse 2s infinite;
@@ -108,18 +108,18 @@
 <body>
     <div id="chat-header">
         <div id="ai-avatar"></div>
-        <h2 style="margin-left: 20px;">مدل زبانی هوش مصنوعی تامین</h2>
+        <h2 style="margin-left: 20px;">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی </h2>
     </div>
     <div id="chat-container"></div>
     <div id="input-container">
-        <input type="text" id="input-text" placeholder="پیام خود را بنویسید..." />
+        <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
         <button id="send-button">ارسال</button>
     </div>
 
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-        const client = await Client.connect("https://6878618ede6aa8465a.gradio.live/");
+        const client = await Client.connect("https://4524ba961f4e2a0542.gradio.live/");
 
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
@@ -149,7 +149,7 @@
                 addMessage(botResponse, 'bot');
             } catch (error) {
                 console.error("An error occurred:", error);
-                addMessage("خطا رخ داد. لطفاً مجدداً تلاش کنید.", 'bot');
+                addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
             }
         }
 
