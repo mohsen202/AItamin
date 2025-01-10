@@ -121,18 +121,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        @media (max-width: 600px) {
-            #input-container {
-                flex-direction: column;
-            }
-            #input-text {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-            #send-button {
-                width: 100%;
-            }
-        }
         /* Typing Effect */
         .typing-effect {
             overflow: hidden;
@@ -148,6 +136,14 @@
         @keyframes blink-caret {
             from, to { border-color: transparent }
             50% { border-color: orange; }
+        }
+        /* Loading Message */
+        .loading-message {
+            display: none; /* Hidden by default */
+            text-align: center;
+            color: #007bff;
+            font-size: 18px;
+            margin-top: 10px;
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -175,6 +171,11 @@
         loadingSpinner.classList.add('loading-spinner');
         chatContainer.appendChild(loadingSpinner); // Add spinner to chat container
 
+        const loadingMessage = document.createElement('div'); // Create loading message dynamically
+        loadingMessage.classList.add('loading-message');
+        loadingMessage.textContent = "لطفا شکیبا باشید...";
+        chatContainer.appendChild(loadingMessage); // Add loading message to chat container
+
         function addMessage(text, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
@@ -190,8 +191,9 @@
             addMessage(userMessage, 'user');
             inputText.value = '';
 
-            // Show loading spinner
+            // Show loading spinner and message
             loadingSpinner.style.display = 'block';
+            loadingMessage.style.display = 'block';
 
             try {
                 const result = await client.predict("/predict", { 
@@ -204,8 +206,9 @@
                 console.error("An error occurred:", error);
                 addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
             } finally {
-                // Hide loading spinner
+                // Hide loading spinner and message
                 loadingSpinner.style.display = 'none';
+                loadingMessage.style.display = 'none';
             }
         }
 
