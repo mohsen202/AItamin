@@ -12,28 +12,29 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #f0f4f8;
+            background-color: #1e1e2f;
+            color: #ffffff;
         }
         #chat-header {
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background-color: #007bff;
+            background-color: #2a2a40;
             color: white;
             border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         #ai-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background-color: white;
+            background-color: #3a3a5a;
             background-image: url('https://s32.picofile.com/file/8481217200/3.png'); /* Replace with your AI avatar URL */
             background-size: cover;
             background-position: center;
             animation: pulse 2s infinite;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -43,10 +44,10 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background-color: #fff;
+            background-color: #2a2a40;
             margin: 20px;
             border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         .message {
             margin: 10px 0;
@@ -54,7 +55,7 @@
             border-radius: 15px;
             max-width: 70%;
             word-wrap: break-word;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .user {
             text-align: right;
@@ -64,27 +65,29 @@
         }
         .bot {
             text-align: left;
-            background-color: #e9ecef;
-            color: #333;
+            background-color: #3a3a5a;
+            color: #ffffff;
             align-self: flex-start;
         }
         #input-container {
             display: flex;
             padding: 20px;
-            border-top: 1px solid #ccc;
-            background-color: #fff;
+            border-top: 1px solid #3a3a5a;
+            background-color: #2a2a40;
             margin: 20px;
             border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         #input-text {
             flex: 1;
             padding: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid #3a3a5a;
             border-radius: 15px;
             margin-right: 10px;
             font-size: 16px;
             outline: none;
+            background-color: #3a3a5a;
+            color: #ffffff;
             transition: border-color 0.3s ease;
         }
         #input-text:focus {
@@ -132,7 +135,7 @@
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-        const client = await Client.connect("https://a3546ef3ff1c431013.gradio.live/");
+        const client = await Client.connect("https://a2eca78a29b941f4ff.gradio.live/");
 
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
