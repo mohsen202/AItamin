@@ -146,8 +146,6 @@
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
         <button id="send-button">ارسال</button>
     </div>
-    <!-- Loading Spinner -->
-    <div id="loading-spinner" class="loading-spinner"></div>
 
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
@@ -157,7 +155,9 @@
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
         const sendButton = document.getElementById('send-button');
-        const loadingSpinner = document.getElementById('loading-spinner');
+        const loadingSpinner = document.createElement('div'); // Create spinner dynamically
+        loadingSpinner.classList.add('loading-spinner');
+        chatContainer.appendChild(loadingSpinner); // Add spinner to chat container
 
         function addMessage(text, sender) {
             const messageElement = document.createElement('div');
