@@ -48,6 +48,10 @@
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .message {
             margin: 10px 0;
@@ -158,7 +162,9 @@
         <div id="ai-avatar"></div>
         <h2 style="margin-left: 10px;">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</h2>
     </div>
-    <div id="chat-container"></div>
+    <div id="chat-container">
+        <div class="message bot">لطفا شکیبا باشید...</div>
+    </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
         <button id="send-button">ارسال</button>
