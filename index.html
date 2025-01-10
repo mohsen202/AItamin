@@ -133,13 +133,29 @@
                 width: 100%;
             }
         }
+        /* Typing Effect */
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div id="chat-header">
         <div id="ai-avatar"></div>
-        <h2 style="margin-left: 20px;">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</h2>
+        <h2 style="margin-left: 20px;"><span class="typing-effect">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</span></h2>
     </div>
     <div id="chat-container"></div>
     <div id="input-container">
@@ -150,7 +166,7 @@
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-        const client = await Client.connect("https://27a21b5b7ee2599ad1.gradio.live/");
+        const client = await Client.connect("https://5232de0e8f4aae5b6e.gradio.live/");
 
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
