@@ -19,15 +19,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
             background-color: #2a2a40;
             color: white;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         #ai-avatar {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background-color: #3a3a5a;
             background-image: url('https://s32.picofile.com/file/8481217200/3.png'); /* Replace with your AI avatar URL */
@@ -42,20 +42,21 @@
         }
         #chat-container {
             flex: 1;
-            padding: 20px;
+            padding: 10px;
             overflow-y: auto;
             background-color: #2a2a40;
-            margin: 20px;
+            margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         .message {
             margin: 10px 0;
-            padding: 15px;
+            padding: 10px;
             border-radius: 15px;
-            max-width: 70%;
+            max-width: 80%;
             word-wrap: break-word;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
         }
         .user {
             text-align: right;
@@ -71,20 +72,20 @@
         }
         #input-container {
             display: flex;
-            padding: 20px;
+            padding: 10px;
             border-top: 1px solid #3a3a5a;
             background-color: #2a2a40;
-            margin: 20px;
+            margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         #input-text {
             flex: 1;
-            padding: 15px;
+            padding: 10px;
             border: 1px solid #3a3a5a;
             border-radius: 15px;
             margin-right: 10px;
-            font-size: 16px;
+            font-size: 14px;
             outline: none;
             background-color: #3a3a5a;
             color: #ffffff;
@@ -94,13 +95,13 @@
             border-color: #007bff;
         }
         #send-button {
-            padding: 15px 30px;
+            padding: 10px 20px;
             border: none;
             border-radius: 15px;
             background-color: #007bff;
             color: white;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             transition: background-color 0.3s ease;
         }
         #send-button:hover {
@@ -110,8 +111,8 @@
         .loading-spinner {
             display: none; /* Hidden by default */
             margin: 10px auto;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 4px solid #007bff;
             border-top: 4px solid transparent;
             border-radius: 50%;
@@ -122,8 +123,24 @@
             100% { transform: rotate(360deg); }
         }
         @media (max-width: 600px) {
+            #chat-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            #ai-avatar {
+                margin-bottom: 10px;
+            }
+            #chat-container {
+                margin: 5px;
+                padding: 5px;
+            }
+            .message {
+                max-width: 90%;
+                font-size: 12px;
+            }
             #input-container {
                 flex-direction: column;
+                padding: 5px;
             }
             #input-text {
                 margin-right: 0;
@@ -139,7 +156,7 @@
 <body>
     <div id="chat-header">
         <div id="ai-avatar"></div>
-        <h2 style="margin-left: 20px;">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</h2>
+        <h2 style="margin-left: 10px;">اولین مدل زبانی هوش مصنوعی *تامین* نسخه آزمایشی</h2>
     </div>
     <div id="chat-container"></div>
     <div id="input-container">
