@@ -199,12 +199,11 @@
             margin: 0;
             font-size: 16px;
         }
-        #chat-header .left-text,
+        #chat-header .left-text {
+            margin-right: 10px; /* فاصله بین متن و لوگو */
+        }
         #chat-header .right-text {
-            display: flex;
-            align-items: center; /* متن‌ها در وسط عمودی قرار می‌گیرند */
-            height: 100%; /* ارتفاع کامل */
-            margin: 0; /* حذف فاصله‌های اضافی */
+            margin-left: 10px; /* فاصله بین متن و لوگو */
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -213,7 +212,7 @@
     <div id="chat-header">
         <div class="left-text">نسخه آزمایشی</div>
         <div id="ai-avatar"></div>
-        <div class="right-text">اولین مدل زبانی هوش مصنوعی*تامین*</div>
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
     </div>
     <div id="chat-container">
         <!-- Loading container for "لطفا شکیبا باشید" -->
