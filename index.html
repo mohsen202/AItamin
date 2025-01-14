@@ -18,7 +18,7 @@
         #chat-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between; /* اضافه شده */
             padding: 10px;
             background-color: #2a2a40;
             color: white;
@@ -190,13 +190,26 @@
                 width: 100%;
             }
         }
+
+        /* اضافه شده */
+        #chat-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+        #chat-header .right-text {
+            text-align: right;
+        }
+        #chat-header .left-text {
+            text-align: left;
+        }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div id="chat-header">
+        <div class="left-text">نسخه آزمایشی</div> <!-- اضافه شده -->
         <div id="ai-avatar"></div>
-        <h2 style="margin-left: 5px; font-size: 16px;">اولین مدل زبانی هوش مصنوعی*تامین* نسخه آزمایشی</h2>
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی*تامین*</div> <!-- اضافه شده -->
     </div>
     <div id="chat-container">
         <!-- Loading container for "لطفا شکیبا باشید" -->
@@ -212,8 +225,6 @@
         <button class="suggestion-button" data-question="شرایط برقراری مستمری بازماندگان چیست؟">شرایط برقراری مستمری بازماندگان چیست؟</button>
         <button class="suggestion-button" data-question="شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟">شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟</button>
         <button class="suggestion-button" data-question="ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ ">ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ </button>
-
-        
     </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
