@@ -36,7 +36,7 @@
             background-position: center;
             animation: pulse 2s infinite;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin: 0 10px; /* فاصله بین لوگو و متن‌ها */
+            margin: 0; /* حذف فاصله بین لوگو و متن‌ها */
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -167,7 +167,6 @@
             #ai-avatar {
                 width: 40px; /* کاهش اندازه لوگو در موبایل */
                 height: 40px;
-                margin: 0 5px; /* کاهش فاصله بین لوگو و متن‌ها */
             }
             #chat-header h2 {
                 font-size: 14px; /* کاهش اندازه فونت */
@@ -200,10 +199,10 @@
             font-size: 16px;
         }
         #chat-header .left-text {
-            margin-right: 10px; /* فاصله بین متن و لوگو */
+            margin-right: 0; /* حذف فاصله بین متن و لوگو */
         }
         #chat-header .right-text {
-            margin-left: 10px; /* فاصله بین متن و لوگو */
+            margin-left: 0; /* حذف فاصله بین متن و لوگو */
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -212,7 +211,7 @@
     <div id="chat-header">
         <div class="left-text">نسخه آزمایشی</div>
         <div id="ai-avatar"></div>
-        <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی*تامین*</div>
     </div>
     <div id="chat-container">
         <!-- Loading container for "لطفا شکیبا باشید" -->
