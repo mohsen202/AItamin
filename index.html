@@ -17,8 +17,8 @@
         }
         #chat-header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            align-items: center; /* متن‌ها و لوگو در وسط عمودی قرار می‌گیرند */
+            justify-content: space-between; /* متن‌ها به دو طرف لوگو می‌چسبند */
             padding: 10px;
             background-color: #2a2a40;
             color: white;
@@ -197,11 +197,11 @@
             margin: 0;
             font-size: 16px;
         }
+        #chat-header .left-text,
         #chat-header .right-text {
-            text-align: right;
-        }
-        #chat-header .left-text {
-            text-align: left;
+            display: flex;
+            align-items: center; /* متن‌ها در وسط عمودی قرار می‌گیرند */
+            height: 100%; /* ارتفاع کامل */
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
