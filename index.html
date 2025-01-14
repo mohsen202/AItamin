@@ -18,16 +18,17 @@
         #chat-header {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* اضافه شده */
+            justify-content: space-between;
             padding: 10px;
             background-color: #2a2a40;
             color: white;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* جلوگیری از فشرده شدن هدر */
         }
         #ai-avatar {
-            width: 60px;
-            height: 60px;
+            width: 50px; /* کاهش اندازه لوگو */
+            height: 50px;
             border-radius: 50%;
             background-color: #3a3a5a;
             background-image: url('https://s32.picofile.com/file/8482028350/logo3.png'); /* Replace with your AI avatar URL */
@@ -41,7 +42,7 @@
             50% { transform: scale(1.05); }
         }
         #chat-container {
-            flex: 1;
+            flex: 1; /* اشغال بیشترین فضای ممکن */
             padding: 10px;
             overflow-y: auto;
             background-color: #2a2a40;
@@ -79,6 +80,7 @@
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* جلوگیری از فشرده شدن بخش ورودی */
         }
         #input-text {
             flex: 1;
@@ -142,6 +144,7 @@
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* جلوگیری از فشرده شدن بخش پیشنهادات */
         }
         .suggestion-button {
             padding: 10px 20px;
@@ -158,11 +161,14 @@
         }
         @media (max-width: 600px) {
             #chat-header {
-                flex-direction: column;
-                text-align: center;
+                padding: 5px; /* کاهش فاصله‌ها */
             }
             #ai-avatar {
-                margin-bottom: 10px;
+                width: 40px; /* کاهش اندازه لوگو در موبایل */
+                height: 40px;
+            }
+            #chat-header h2 {
+                font-size: 14px; /* کاهش اندازه فونت */
             }
             #chat-container {
                 margin: 5px;
@@ -170,24 +176,19 @@
             }
             .message {
                 max-width: 90%;
-                font-size: 12px;
+                font-size: 12px; /* کاهش اندازه فونت */
             }
             #input-container {
-                flex-direction: column;
                 padding: 5px;
             }
             #input-text {
-                margin-right: 0;
-                margin-bottom: 10px;
+                font-size: 12px; /* کاهش اندازه فونت */
             }
             #send-button {
-                width: 100%;
-            }
-            #suggestions-container {
-                flex-direction: column;
+                font-size: 12px; /* کاهش اندازه فونت */
             }
             .suggestion-button {
-                width: 100%;
+                font-size: 12px; /* کاهش اندازه فونت */
             }
         }
 
@@ -207,9 +208,9 @@
 </head>
 <body>
     <div id="chat-header">
-        <div class="left-text">نسخه آزمایشی</div> <!-- اضافه شده -->
+        <div class="left-text">نسخه آزمایشی</div>
         <div id="ai-avatar"></div>
-        <div class="right-text">اولین مدل زبانی هوش مصنوعی*تامین*</div> <!-- اضافه شده -->
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی*تامین*</div>
     </div>
     <div id="chat-container">
         <!-- Loading container for "لطفا شکیبا باشید" -->
