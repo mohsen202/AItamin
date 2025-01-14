@@ -44,12 +44,12 @@
         #chat-container {
             flex: 1;
             padding: 10px;
-            overflow-y: auto;
             background-color: #2a2a40;
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            height: calc(100vh - 180px); /* Adjust height dynamically */
+            min-height: calc(100vh - 180px); /* Adjust height dynamically */
+            overflow: hidden; /* Prevent scrolling */
         }
         .message {
             margin: 8px 0;
@@ -145,7 +145,7 @@
             #chat-container {
                 margin: 5px;
                 padding: 5px;
-                height: calc(100vh - 160px); /* Adjust height for mobile */
+                min-height: calc(100vh - 160px); /* Adjust height for mobile */
             }
             .message {
                 max-width: 90%;
