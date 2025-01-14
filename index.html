@@ -30,13 +30,13 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background-color: #3a3a5a; /* Fallback color */
-            background-image: url('https://s32.picofile.com/file/8482028350/logo3.png'); /* آدرس تصویر لوگو */
+            background-color: #3a3a5a;
+            background-image: url('https://s32.picofile.com/file/8482028350/logo3.png');
             background-size: cover;
             background-position: center;
             animation: pulse 2s infinite, moveUpDown 3s infinite;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin: 0;
+            margin: 0 20px; /* فاصله از متن‌ها */
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -170,6 +170,7 @@
             #ai-avatar {
                 width: 40px;
                 height: 40px;
+                margin: 0 10px; /* فاصله کمتر در موبایل */
             }
             #chat-header h2 {
                 font-size: 14px;
@@ -204,12 +205,14 @@
             font-size: 16px;
         }
         #chat-header .left-text {
-            margin-right: 0;
+            margin-right: 20px; /* فاصله از لوگو */
             text-align: right;
+            flex-grow: 1; /* گسترش متن به اندازه‌ی مناسب */
         }
         #chat-header .right-text {
-            margin-left: 0;
+            margin-left: 20px; /* فاصله از لوگو */
             text-align: left;
+            flex-grow: 1; /* گسترش متن به اندازه‌ی مناسب */
         }
     </style>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -217,7 +220,7 @@
 <body>
     <div id="chat-header">
         <div class="left-text">نسخه آزمایشی</div>
-        <div id="ai-avatar"></div> <!-- متن "لوگو" حذف شد -->
+        <div id="ai-avatar"></div>
         <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
     </div>
     <div id="chat-container">
@@ -230,6 +233,7 @@
         <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
         <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
         <button class="suggestion-button" data-question="مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟">مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟</button>
+        <button class="suggestion-button" data-question="شرایط برقراری مستمری بازماندگان چیست؟">شرایط برقراری مستمری بازماندگان چیست؟</button>
         <button class="suggestion-button" data-question="شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟">شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟</button>
         <button class="suggestion-button" data-question="ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ ">ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ </button>
     </div>
