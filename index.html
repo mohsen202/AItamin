@@ -132,6 +132,30 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        /* Auto Suggest Styles */
+        #suggestions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .suggestion-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #3a3a5a;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .suggestion-button:hover {
+            background-color: #007bff;
+        }
         @media (max-width: 600px) {
             #chat-header {
                 flex-direction: column;
@@ -159,6 +183,12 @@
             #send-button {
                 width: 100%;
             }
+            #suggestions-container {
+                flex-direction: column;
+            }
+            .suggestion-button {
+                width: 100%;
+            }
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -175,6 +205,12 @@
             <div class="loading-text">لطفا شکیبا باشید...</div>
         </div>
     </div>
+    <div id="suggestions-container">
+        <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
+        <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
+        <button class="suggestion-button" data-question="متن کامل ماده 66 قانون تامین اجتماعی چیست؟">متن کامل ماده 66 قانون تامین اجتماعی چیست؟</button>
+        <button class="suggestion-button" data-question="شرایط برقراری مستمری بازماندگان چیست؟">شرایط برقراری مستمری بازماندگان چیست؟</button>
+    </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
         <button id="send-button">ارسال</button>
@@ -189,6 +225,7 @@
         const inputText = document.getElementById('input-text');
         const sendButton = document.getElementById('send-button');
         const loadingContainer = document.getElementById('loading-container'); // Loading container
+        const suggestionButtons = document.querySelectorAll('.suggestion-button');
 
         function addMessage(text, sender) {
             const messageElement = document.createElement('div');
@@ -198,8 +235,8 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        async function sendMessage() {
-            const userMessage = inputText.value.trim();
+        async function sendMessage(message) {
+            const userMessage = message || inputText.value.trim();
             if (!userMessage) return;
 
             addMessage(userMessage, 'user');
@@ -224,11 +261,18 @@
             }
         }
 
-        sendButton.addEventListener('click', sendMessage);
+        sendButton.addEventListener('click', () => sendMessage());
         inputText.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 sendMessage();
             }
+        });
+
+        suggestionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const question = button.getAttribute('data-question');
+                sendMessage(question);
+            });
         });
     </script>
 </body>
