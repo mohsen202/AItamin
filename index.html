@@ -146,6 +146,7 @@
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             flex-shrink: 0; /* جلوگیری از فشرده شدن بخش پیشنهادات */
+            justify-content: center; /* وسط‌چین کردن پیشنهادات */
         }
         .suggestion-button {
             padding: 10px 20px;
@@ -190,6 +191,10 @@
             }
             .suggestion-button {
                 font-size: 12px; /* کاهش اندازه فونت */
+            }
+            #suggestions-container {
+                flex-direction: column; /* چیدمان عمودی در موبایل */
+                align-items: center; /* وسط‌چین کردن در موبایل */
             }
         }
 
