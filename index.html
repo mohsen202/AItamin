@@ -1,25 +1,241 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اولین مدل زبانی هوش مصنوعی*تامین* دمو</title>
+    <title>اولین مدل زبانی هوش مصنوعی تامین</title>
     <style>
-        /* استایل‌ها همان‌طور که هستند */
+        body {
+            font-family: 'Vazir', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #1e1e2f;
+            color: #ffffff;
+        }
+        #chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #2a2a40;
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        #ai-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #3a3a5a;
+            background-image: url('https://s32.picofile.com/file/8482028350/logo3.png');
+            background-size: cover;
+            background-position: center;
+            animation: pulse 2s infinite, moveUpDown 3s infinite;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin: 0 20px;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes moveUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(20px); }
+        }
+        #chat-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+        .user {
+            text-align: right;
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot {
+            text-align: left;
+            background-color: #3a3a5a;
+            color: #ffffff;
+            align-self: flex-start;
+        }
+        #input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #3a3a5a;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        #input-text {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #3a3a5a;
+            border-radius: 15px;
+            margin-right: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #3a3a5a;
+            color: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+        #input-text:focus {
+            border-color: #007bff;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        .loading-container {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #007bff;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        .loading-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #suggestions-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+            justify-content: center;
+        }
+        .suggestion-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #3a3a5a;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .suggestion-button:hover {
+            background-color: #007bff;
+        }
+        @media (max-width: 600px) {
+            #chat-header {
+                padding: 5px;
+            }
+            #ai-avatar {
+                width: 40px;
+                height: 40px;
+                margin: 0 10px;
+            }
+            #chat-header h2 {
+                font-size: 14px;
+            }
+            #chat-container {
+                margin: 5px;
+                padding: 5px;
+            }
+            .message {
+                max-width: 90%;
+                font-size: 12px;
+            }
+            #input-container {
+                padding: 5px;
+            }
+            #input-text {
+                font-size: 12px;
+            }
+            #send-button {
+                font-size: 12px;
+            }
+            .suggestion-button {
+                font-size: 12px;
+            }
+            #suggestions-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        #chat-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+        #chat-header .left-text {
+            margin-right: 20px;
+            text-align: right;
+            flex-grow: 1;
+        }
+        #chat-header .right-text {
+            margin-left: 20px;
+            text-align: left;
+            flex-grow: 1;
+        }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div id="chat-header">
+        <div class="left-text">نسخه آزمایشی</div>
         <div id="ai-avatar"></div>
-        <h2 style="margin-left: 5px;">اولین مدل زبانی هوش مصنوعی*تامین*دمو</h2>
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
     </div>
     <div id="chat-container">
-        <!-- Loading container for "لطفا شکیبا باشید" -->
         <div class="loading-container" id="loading-container">
             <div class="loading-spinner"></div>
             <div class="loading-text">لطفا شکیبا باشید...</div>
         </div>
+    </div>
+    <div id="suggestions-container">
+        <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
+        <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
+        <button class="suggestion-button" data-question="مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟">مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟</button>
+        <button class="suggestion-button" data-question="شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟">شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟</button>
+        <button class="suggestion-button" data-question="ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟">ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟</button>
+        <button class="suggestion-button" data-question="ازکارافتادگی چیست و چند مدل از کارافتادگی وجود دارد؟">ازکارافتادگی چیست و چند مدل از کارافتادگی وجود دارد؟</button>
     </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
@@ -36,7 +252,7 @@
                     throw new Error('فایل gr.txt یافت نشد');
                 }
                 const url = await response.text();
-                return url.trim(); // حذف فاصله‌های اضافی و خطوط جدید
+                return url.trim();
             } catch (error) {
                 console.error("خطا در خواندن فایل gr.txt:", error);
                 return null;
@@ -55,7 +271,8 @@
             const chatContainer = document.getElementById('chat-container');
             const inputText = document.getElementById('input-text');
             const sendButton = document.getElementById('send-button');
-            const loadingContainer = document.getElementById('loading-container'); // Loading container
+            const loadingContainer = document.getElementById('loading-container');
+            const suggestionButtons = document.querySelectorAll('.suggestion-button');
 
             function addMessage(text, sender) {
                 const messageElement = document.createElement('div');
@@ -65,14 +282,13 @@
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
 
-            async function sendMessage() {
-                const userMessage = inputText.value.trim();
+            async function sendMessage(message) {
+                const userMessage = message || inputText.value.trim();
                 if (!userMessage) return;
 
                 addMessage(userMessage, 'user');
                 inputText.value = '';
 
-                // Show loading spinner and text
                 loadingContainer.style.display = 'block';
 
                 try {
@@ -80,22 +296,28 @@
                         input_text: userMessage, 
                     });
 
-                    const botResponse = result.data[0]; // Assuming the response is in the first element of the result data
+                    const botResponse = result.data[0];
                     addMessage(botResponse, 'bot');
                 } catch (error) {
                     console.error("An error occurred:", error);
                     addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
                 } finally {
-                    // Hide loading spinner and text
                     loadingContainer.style.display = 'none';
                 }
             }
 
-            sendButton.addEventListener('click', sendMessage);
+            sendButton.addEventListener('click', () => sendMessage());
             inputText.addEventListener('keypress', (event) => {
                 if (event.key === 'Enter') {
                     sendMessage();
                 }
+            });
+
+            suggestionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const question = button.getAttribute('data-question');
+                    sendMessage(question);
+                });
             });
         }
 
