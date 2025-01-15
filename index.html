@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اولین مدل زبانی هوش مصنوعی تامین</title>
+    <title>اولین مدل زبانی هوش مصنوعی*تامین*</title>
     <style>
         body {
             font-family: 'Vazir', sans-serif;
@@ -36,7 +36,7 @@
             background-position: center;
             animation: pulse 2s infinite, moveUpDown 3s infinite;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin: 0 20px;
+            margin: 0 20px; /* فاصله از متن‌ها */
         }
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -170,7 +170,7 @@
             #ai-avatar {
                 width: 40px;
                 height: 40px;
-                margin: 0 10px;
+                margin: 0 10px; /* فاصله کمتر در موبایل */
             }
             #chat-header h2 {
                 font-size: 14px;
@@ -205,14 +205,14 @@
             font-size: 16px;
         }
         #chat-header .left-text {
-            margin-right: 20px;
+            margin-right: 20px; /* فاصله از لوگو */
             text-align: right;
-            flex-grow: 1;
+            flex-grow: 1; /* گسترش متن به اندازه‌ی مناسب */
         }
         #chat-header .right-text {
-            margin-left: 20px;
+            margin-left: 20px; /* فاصله از لوگو */
             text-align: left;
-            flex-grow: 1;
+            flex-grow: 1; /* گسترش متن به اندازه‌ی مناسب */
         }
     </style>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
@@ -234,8 +234,9 @@
         <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
         <button class="suggestion-button" data-question="مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟">مبلغ پرداختی برای عینک طبی در سال ۱۴۰۳ چقدر است؟</button>
         <button class="suggestion-button" data-question="شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟">شرایط بازنشستگی در تامین اجتماعی رو میشه توضیح بدی؟</button>
-        <button class="suggestion-button" data-question="ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟">ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟</button>
-        <button class="suggestion-button" data-question="ازکارافتادگی چیست و چند مدل از کارافتادگی وجود دارد؟">ازکارافتادگی چیست و چند مدل از کارافتادگی وجود دارد؟</button>
+        <button class="suggestion-button" data-question="ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ ">ممکنه فرمول متناسب سازی سال 1403 رو به من بدهید؟ </button>
+        <button class="suggestion-button" data-question="ازکارافتادگی چیست و چند مدل  از کارافتادگی وجود دارد؟">ازکارافتادگی چیست و چند مدل  از کارافتادگی وجود دارد؟ </button>
+
     </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
@@ -245,83 +246,59 @@
     <script type="module">
         import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-        async function getServerUrl() {
+        const client = await Client.connect("https://c9b86d3af3a0a5fedd.gradio.live/");
+
+        const chatContainer = document.getElementById('chat-container');
+        const inputText = document.getElementById('input-text');
+        const sendButton = document.getElementById('send-button');
+        const loadingContainer = document.getElementById('loading-container');
+        const suggestionButtons = document.querySelectorAll('.suggestion-button');
+
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage(message) {
+            const userMessage = message || inputText.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, 'user');
+            inputText.value = '';
+
+            loadingContainer.style.display = 'block';
+
             try {
-                const response = await fetch('gr.txt');
-                if (!response.ok) {
-                    throw new Error('فایل gr.txt یافت نشد');
-                }
-                const url = await response.text();
-                return url.trim();
-            } catch (error) {
-                console.error("خطا در خواندن فایل gr.txt:", error);
-                return null;
-            }
-        }
-
-        async function initializeClient() {
-            const serverUrl = await getServerUrl();
-            if (!serverUrl) {
-                alert("خطا در دریافت آدرس سرور. لطفا مطمئن شوید که فایل gr.txt وجود دارد و حاوی آدرس سرور است.");
-                return;
-            }
-
-            const client = await Client.connect(serverUrl);
-
-            const chatContainer = document.getElementById('chat-container');
-            const inputText = document.getElementById('input-text');
-            const sendButton = document.getElementById('send-button');
-            const loadingContainer = document.getElementById('loading-container');
-            const suggestionButtons = document.querySelectorAll('.suggestion-button');
-
-            function addMessage(text, sender) {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', sender);
-                messageElement.textContent = text;
-                chatContainer.appendChild(messageElement);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            async function sendMessage(message) {
-                const userMessage = message || inputText.value.trim();
-                if (!userMessage) return;
-
-                addMessage(userMessage, 'user');
-                inputText.value = '';
-
-                loadingContainer.style.display = 'block';
-
-                try {
-                    const result = await client.predict("/predict", { 
-                        input_text: userMessage, 
-                    });
-
-                    const botResponse = result.data[0];
-                    addMessage(botResponse, 'bot');
-                } catch (error) {
-                    console.error("An error occurred:", error);
-                    addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
-                } finally {
-                    loadingContainer.style.display = 'none';
-                }
-            }
-
-            sendButton.addEventListener('click', () => sendMessage());
-            inputText.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            suggestionButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const question = button.getAttribute('data-question');
-                    sendMessage(question);
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
                 });
-            });
+
+                const botResponse = result.data[0];
+                addMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("An error occurred:", error);
+                addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
+            } finally {
+                loadingContainer.style.display = 'none';
+            }
         }
 
-        initializeClient();
+        sendButton.addEventListener('click', () => sendMessage());
+        inputText.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        suggestionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const question = button.getAttribute('data-question');
+                sendMessage(question);
+            });
+        });
     </script>
 </body>
 </html>
