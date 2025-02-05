@@ -203,10 +203,7 @@
     <div id="suggestions-container">
         <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
         <button class="suggestion-button" data-question="بیمه دانشجویان کجا قرارداد ببندم؟">بیمه دانشجویان کجا قرارداد ببندم؟</button>
-        <button class="suggestion-button" data-question="مبلغ پرداختی برای شیشه عینک طبی در سال ۱۴۰۳ چقدر است؟">مبلغ پرداختی برای شیشه عینک طبی در سال ۱۴۰۳ چقدر است؟</button>
-        <button class="suggestion-button" data-question="شرایط بازنشستگی کارگران در مشاغل سخت و زیان‌آور چگونه است؟">شرایط بازنشستگی کارگران در مشاغل سخت و زیان‌آور چگونه است؟</button>
-        <button class="suggestion-button" data-question="شرایط سن و سابقه برای بازنشستگی چگونه است؟"> شرایط سن و سابقه برای بازنشستگی چگونه است؟</button>
-        <button class="suggestion-button" id="start-quiz-button">شروع آزمون</button>
+        <button class="suggestion-button" id="start-quiz-button">آزمون شایسته گزینی</button>
     </div>
     <div id="input-container">
         <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
@@ -273,9 +270,9 @@
         function handleAnswer(userAnswer, questionData) {
             if (userAnswer === questionData.correctAnswer) {
                 userScore += 1;
-                addMessage("✅ پاسخ شما صحیح است!", 'bot');
+                addMessage("✅صحیح!", 'bot');
             } else {
-                addMessage(`❌ پاسخ شما نادرست است! پاسخ صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
+                addMessage(`❌نادرست!  صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
             }
             currentQuestionIndex += 1;
             if (currentQuestionIndex < quizQuestions.length) {
