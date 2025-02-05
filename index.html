@@ -256,7 +256,7 @@
                 userScore += 1;
                 addMessage("✅ پاسخ شما صحیح است!", 'bot');
             } else {
-                addMessage(`❌ پاسخ شما نادرست است! پاسخ صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
+                addMessage(`نادرست!❌ پاسخ صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
             }
             currentQuestionIndex += 1;
             if (currentQuestionIndex < quizQuestions.length) {
