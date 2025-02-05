@@ -251,18 +251,18 @@
             questionData.options.forEach((option, index) => {
                 const button = document.createElement('button');
                 button.textContent = option;
-                button.addEventListener('click', () => handleAnswer(index, questionData.correctAnswer));
+                button.addEventListener('click', () => handleAnswer(index, questionData));
                 optionsDiv.appendChild(button);
             });
             chatContainer.appendChild(optionsDiv);
         }
 
-        function handleAnswer(userAnswer, correctAnswer) {
-            if (userAnswer === correctAnswer) {
+        function handleAnswer(userAnswer, questionData) {
+            if (userAnswer === questionData.correctAnswer) {
                 userScore += 1;
                 addMessage("✅ پاسخ شما صحیح است!", 'bot');
             } else {
-                addMessage("❌ پاسخ شما نادرست است!", 'bot');
+                addMessage(`❌ پاسخ شما نادرست است! پاسخ صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
             }
             currentQuestionIndex += 1;
             if (currentQuestionIndex < quizQuestions.length) {
