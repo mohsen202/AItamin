@@ -279,17 +279,6 @@
             addMessage(userMessage, 'user');
             inputText.value = '';
 
-            if (userMessage === "شروع آزمون") {
-                currentQuestionIndex = 0;
-                userScore = 0;
-                if (quizQuestions.length > 0) {
-                    showQuestion(quizQuestions[currentQuestionIndex]);
-                } else {
-                    addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
-                }
-                return;
-            }
-
             loadingContainer.style.display = 'block';
 
             try {
@@ -307,6 +296,16 @@
             }
         }
 
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            userScore = 0;
+            if (quizQuestions.length > 0) {
+                showQuestion(quizQuestions[currentQuestionIndex]);
+            } else {
+                addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
+            }
+        }
+
         sendButton.addEventListener('click', () => sendMessage());
         inputText.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
@@ -321,7 +320,7 @@
             });
         });
 
-        startQuizButton.addEventListener('click', () => sendMessage("شروع آزمون"));
+        startQuizButton.addEventListener('click', startQuiz);
 
         // بارگیری سوالات هنگام لود صفحه
         loadQuestions();
