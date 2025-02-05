@@ -202,7 +202,6 @@
     </div>
     <div id="suggestions-container">
         <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
-        <button class="suggestion-button" data-question="بیمه دانشجویان کجا قرارداد ببندم؟">بیمه دانشجویان کجا قرارداد ببندم؟</button>
         <button class="suggestion-button" id="start-quiz-button">آزمون شایسته گزینی</button>
     </div>
     <div id="input-container">
@@ -211,6 +210,10 @@
     </div>
 
     <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
+
+        const client = await Client.connect("https://785fc405a5504d7566.gradio.live/");
+
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
         const sendButton = document.getElementById('send-button');
@@ -254,6 +257,30 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        async function sendMessage(message) {
+            const userMessage = message || inputText.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, 'user');
+            inputText.value = '';
+
+            loadingContainer.style.display = 'block';
+
+            try {
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
+                });
+
+                const botResponse = result.data[0];
+                addMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("An error occurred:", error);
+                addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
+            } finally {
+                loadingContainer.style.display = 'none';
+            }
+        }
+
         function showQuestion(questionData) {
             addMessage(questionData.question, 'bot');
             const optionsDiv = document.createElement('div');
@@ -293,18 +320,17 @@
             showQuestion(quizQuestions[currentQuestionIndex]);
         }
 
-        sendButton.addEventListener('click', () => {
-            const userMessage = inputText.value.trim();
-            if (userMessage) {
-                addMessage(userMessage, 'user');
-                inputText.value = '';
+        sendButton.addEventListener('click', () => sendMessage());
+        inputText.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         });
 
         suggestionButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const question = button.getAttribute('data-question');
-                addMessage(question, 'user');
+                sendMessage(question);
             });
         });
 
