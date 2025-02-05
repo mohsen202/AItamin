@@ -35,6 +35,9 @@
     <div id="suggestions-container">
         <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
         <button class="suggestion-button" data-question="بیمه دانشجویان کجا قرارداد ببندم؟">بیمه دانشجویان کجا قرارداد ببندم؟</button>
+        <button class="suggestion-button" data-question="مبلغ پرداختی برای شیشه عینک طبی در سال ۱۴۰۳ چقدر است؟">مبلغ پرداختی برای شیشه عینک طبی در سال ۱۴۰۳ چقدر است؟</button>
+        <button class="suggestion-button" data-question="شرایط بازنشستگی کارگران در مشاغل سخت و زیان‌آور چگونه است؟">شرایط بازنشستگی کارگران در مشاغل سخت و زیان‌آور چگونه است؟</button>
+        <button class="suggestion-button" data-question="شرایط سن و سابقه برای بازنشستگی چگونه است؟"> شرایط سن و سابقه برای بازنشستگی چگونه است؟</button>
         <button class="suggestion-button" id="start-quiz-button">شروع آزمون</button>
     </div>
     <div id="input-container">
@@ -54,20 +57,24 @@
         let currentQuestionIndex = 0;
         let userScore = 0;
 
-        // بارگیری سوالات از فایل CSV
+        // بارگیری سوالات از Google Sheets
         async function loadQuestions() {
             try {
-                const response = await fetch('questions.csv');
-                const csvData = await response.text();
-                const rows = csvData.split('\n').slice(1); // حذف سطر عنوان
-                quizQuestions = rows.map(row => {
-                    const [question, option1, option2, option3, option4, correctAnswer] = row.split(',');
-                    return {
-                        question,
-                        options: [option1, option2, option3, option4],
-                        correctAnswer: parseInt(correctAnswer)
-                    };
+                const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
+                const gid = '109137920'; // شناسه صفحه (Sheet)
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
+
+                quizQuestions = json.table.rows.map(row => {
+                    const question = row.c[0].v; // ستون اول: سوال
+                    const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
+                    const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
+                    return { question, options, correctAnswer };
                 });
+
                 console.log("سوالات بارگیری شدند:", quizQuestions); // برای دیباگ
             } catch (error) {
                 console.error("خطا در بارگیری سوالات:", error);
