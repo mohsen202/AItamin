@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اولین مدل زبانی هوش مصنوعی*تامین*</title>
+    <title>اولین مدل زبانی هوش مصنوعی تامین</title>
     <style>
         body {
             font-family: 'Vazir', sans-serif;
@@ -185,6 +185,44 @@
         .options button:hover {
             background-color: #007bff;
         }
+        #auth-container {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #email-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #3a3a5a;
+            border-radius: 15px;
+            margin-right: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #3a3a5a;
+            color: #ffffff;
+            transition: border-color 0.3s ease;
+            direction: rtl; /* جهت متن راست‌به‌چپ */
+        }
+        #email-input:focus {
+            border-color: #007bff;
+        }
+        #auth-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        #auth-button:hover {
+            background-color: #0056b3;
+        }
     </style>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
@@ -193,6 +231,10 @@
         <div class="left-text">نسخه آزمایشی</div>
         <div id="ai-avatar"></div>
         <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
+    </div>
+    <div id="auth-container">
+        <input type="email" id="email-input" placeholder="ایمیل خود را وارد کنید..." />
+        <button id="auth-button">تایید ایمیل</button>
     </div>
     <div id="chat-container">
         <div class="loading-container" id="loading-container">
@@ -220,10 +262,33 @@
         const loadingContainer = document.getElementById('loading-container');
         const suggestionButtons = document.querySelectorAll('.suggestion-button');
         const startQuizButton = document.getElementById('start-quiz-button');
+        const authContainer = document.getElementById('auth-container');
+        const emailInput = document.getElementById('email-input');
+        const authButton = document.getElementById('auth-button');
 
         let quizQuestions = [];
         let currentQuestionIndex = 0;
         let userScore = 0;
+
+        // تابع برای بررسی مجوز ایمیل
+        async function checkEmailAuthorization(email) {
+            try {
+                const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
+                const gid = '0'; // شناسه صفحه (Sheet)
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
+
+                const authorizedEmails = json.table.rows.map(row => row.c[0].v); // ستون اول: ایمیل‌های مجاز
+
+                return authorizedEmails.includes(email);
+            } catch (error) {
+                console.error("خطا در بررسی مجوز ایمیل:", error);
+                return false;
+            }
+        }
 
         // بارگیری سوالات از Google Sheets
         async function loadQuestions() {
@@ -320,6 +385,7 @@
             showQuestion(quizQuestions[currentQuestionIndex]);
         }
 
+        // رویدادها
         sendButton.addEventListener('click', () => sendMessage());
         inputText.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
@@ -336,8 +402,19 @@
 
         startQuizButton.addEventListener('click', startQuiz);
 
-        // بارگیری سوالات هنگام لود صفحه
-        loadQuestions();
+        // تایید ایمیل
+        authButton.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            if (!email) return;
+
+            const isAuthorized = await checkEmailAuthorization(email);
+            if (isAuthorized) {
+                authContainer.style.display = 'none';
+                loadQuestions();
+            } else {
+                alert("ایمیل شما مجاز نیست.");
+            }
+        });
     </script>
 </body>
 </html>
