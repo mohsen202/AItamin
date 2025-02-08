@@ -1,66 +1,169 @@
-const startQuizButton = document.getElementById('start-quiz-button');
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اولین مدل زبانی هوش مصنوعی تامین</title>
+    <style>
+        /* استایل‌ها مانند قبل */
+    </style>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="chat-header">
+        <div class="left-text">نسخه آزمایشی</div>
+        <div id="ai-avatar"></div>
+        <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
+    </div>
+    <div id="chat-container">
+        <div class="loading-container" id="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">لطفا شکیبا باشید...</div>
+        </div>
+    </div>
+    <div id="suggestions-container">
+        <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
+        <button class="suggestion-button" id="start-quiz-button">آزمون شایسته گزینی</button>
+    </div>
+    <div id="input-container">
+        <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
+        <button id="send-button">ارسال</button>
+    </div>
 
-let quizQuestions = [];
-let currentQuestionIndex = 0;
-let userScore = 0;
+    <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-// بارگیری سوالات از Google Sheets
-async function loadQuestions() {
-    try {
-        const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
-        const gid = '109137920'; // شناسه صفحه (Sheet)
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+        const client = await Client.connect("https://785fc405a5504d7566.gradio.live/");
 
-        const response = await fetch(url);
-        const text = await response.text();
-        const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
+        const chatContainer = document.getElementById('chat-container');
+        const inputText = document.getElementById('input-text');
+        const sendButton = document.getElementById('send-button');
+        const loadingContainer = document.getElementById('loading-container');
+        const suggestionButtons = document.querySelectorAll('.suggestion-button');
+        const startQuizButton = document.getElementById('start-quiz-button');
 
-        quizQuestions = json.table.rows.map(row => {
-            const question = row.c[0].v; // ستون اول: سوال
-            const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
-            const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
-            return { question, options, correctAnswer };
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+
+        // بارگیری سوالات از Google Sheets
+        async function loadQuestions() {
+            try {
+                const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
+                const gid = '109137920'; // شناسه صفحه (Sheet)
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+
+                const response = await fetch(url);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
+
+                quizQuestions = json.table.rows.map(row => {
+                    const question = row.c[0].v; // ستون اول: سوال
+                    const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
+                    const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
+                    return { question, options, correctAnswer };
+                });
+
+                console.log("سوالات بارگیری شدند:", quizQuestions); // برای دیباگ
+            } catch (error) {
+                console.error("خطا در بارگیری سوالات:", error);
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage(message) {
+            const userMessage = message || inputText.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, 'user');
+            inputText.value = '';
+
+            loadingContainer.style.display = 'block';
+
+            try {
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
+                });
+
+                const botResponse = result.data[0];
+                addMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("An error occurred:", error);
+                addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
+            } finally {
+                loadingContainer.style.display = 'none';
+            }
+        }
+
+        function showQuestion(questionData) {
+            console.log("نمایش سوال:", questionData); // برای دیباگ
+            addMessage(questionData.question, 'bot');
+            const optionsDiv = document.createElement('div');
+            optionsDiv.classList.add('options');
+            questionData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.addEventListener('click', () => handleAnswer(index, questionData));
+                optionsDiv.appendChild(button);
+            });
+            chatContainer.appendChild(optionsDiv);
+        }
+
+        function handleAnswer(userAnswer, questionData) {
+            if (userAnswer === questionData.correctAnswer) {
+                userScore += 1;
+                addMessage("✅صحیح!", 'bot');
+            } else {
+                addMessage(`❌نادرست!  صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
+            }
+            currentQuestionIndex += 1;
+            if (currentQuestionIndex < quizQuestions.length) {
+                showQuestion(quizQuestions[currentQuestionIndex]);
+            } else {
+                addMessage(`آزمون پایان یافت! امتیاز شما: ${userScore}/${quizQuestions.length}`, 'bot');
+            }
+        }
+
+        function startQuiz() {
+            if (quizQuestions.length === 0) {
+                console.error("سوالات بارگیری نشده‌اند!"); // برای دیباگ
+                addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
+                return;
+            }
+            currentQuestionIndex = 0;
+            userScore = 0;
+            chatContainer.innerHTML = ''; // پاک کردن چت قبلی
+            showQuestion(quizQuestions[currentQuestionIndex]);
+        }
+
+        sendButton.addEventListener('click', () => sendMessage());
+        inputText.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        console.log("سوالات بارگیری شدند:", quizQuestions); // برای دیباگ
-    } catch (error) {
-        console.error("خطا در بارگیری سوالات:", error);
-    }
-}
+        suggestionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const question = button.getAttribute('data-question');
+                sendMessage(question);
+            });
+        });
 
-// شروع آزمون
-function startQuiz() {
-    if (quizQuestions.length === 0) {
-        console.error("سوالات بارگیری نشده‌اند!"); // برای دیباگ
-        addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
-        return;
-    }
-    currentQuestionIndex = 0;
-    userScore = 0;
-    chatContainer.innerHTML = ''; // پاک کردن چت قبلی
-    showQuestion(quizQuestions[currentQuestionIndex]);
-}
+        startQuizButton.addEventListener('click', () => {
+            console.log("دکمه شروع آزمون کلیک شد!"); // برای دیباگ
+            startQuiz();
+        });
 
-// نمایش سوال
-function showQuestion(questionData) {
-    console.log("نمایش سوال:", questionData); // برای دیباگ
-    addMessage(questionData.question, 'bot');
-    const optionsDiv = document.createElement('div');
-    optionsDiv.classList.add('options');
-    questionData.options.forEach((option, index) => {
-        const button = document.createElement('button');
-        button.textContent = option;
-        button.addEventListener('click', () => handleAnswer(index, questionData));
-        optionsDiv.appendChild(button);
-    });
-    chatContainer.appendChild(optionsDiv);
-}
-
-// رویداد کلیک دکمه شروع آزمون
-startQuizButton.addEventListener('click', () => {
-    console.log("دکمه شروع آزمون کلیک شد!"); // برای دیباگ
-    startQuiz();
-});
-
-// بارگیری سوالات هنگام لود صفحه
-loadQuestions();
+        // بارگیری سوالات هنگام لود صفحه
+        loadQuestions();
+    </script>
+</body>
+</html>
