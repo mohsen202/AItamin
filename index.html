@@ -1,123 +1,66 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آزمون شایسته‌گزینی</title>
-    <style>
-        /* استایل‌ها مانند قبل */
-    </style>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
-    <div id="chat-header">
-        <div class="left-text">نسخه آزمایشی</div>
-        <div id="ai-avatar"></div>
-        <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
-    </div>
-    <div id="auth-container">
-        <input type="email" id="email-input" placeholder="ایمیل خود را وارد کنید..." />
-        <button id="auth-button">تایید ایمیل</button>
-    </div>
-    <div id="chat-container">
-        <div class="loading-container" id="loading-container">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">لطفا شکیبا باشید...</div>
-        </div>
-    </div>
-    <div id="suggestions-container">
-        <button class="suggestion-button" data-question="درباره بیمه زنان خانه دار توضیح بده؟">درباره بیمه زنان خانه دار توضیح بده؟</button>
-        <button class="suggestion-button" id="start-quiz-button">آزمون شایسته گزینی</button>
-    </div>
-    <div id="input-container">
-        <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
-        <button id="send-button">ارسال</button>
-    </div>
+const startQuizButton = document.getElementById('start-quiz-button');
 
-    <script type="module">
-        const chatContainer = document.getElementById('chat-container');
-        const inputText = document.getElementById('input-text');
-        const sendButton = document.getElementById('send-button');
-        const loadingContainer = document.getElementById('loading-container');
-        const suggestionButtons = document.querySelectorAll('.suggestion-button');
-        const startQuizButton = document.getElementById('start-quiz-button');
-        const authContainer = document.getElementById('auth-container');
-        const emailInput = document.getElementById('email-input');
-        const authButton = document.getElementById('auth-button');
+let quizQuestions = [];
+let currentQuestionIndex = 0;
+let userScore = 0;
 
-        let quizQuestions = [];
-        let currentQuestionIndex = 0;
-        let userScore = 0;
+// بارگیری سوالات از Google Sheets
+async function loadQuestions() {
+    try {
+        const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
+        const gid = '109137920'; // شناسه صفحه (Sheet)
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
 
-        // تابع برای بررسی مجوز ایمیل
-        async function checkEmailAuthorization(email) {
-            try {
-                const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
-                const gid = '0'; // شناسه صفحه (Sheet)
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+        const response = await fetch(url);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
 
-                const response = await fetch(url);
-                const text = await response.text();
-                
-                // پردازش پاسخ JSON
-                const json = JSON.parse(text.substring(47, text.length - 2)); // حذف پیش‌وند و پس‌وند اضافی
-                const authorizedEmails = json.table.rows.map(row => row.c[0].v); // ستون اول: ایمیل‌های مجاز
-
-                return authorizedEmails.includes(email);
-            } catch (error) {
-                console.error("خطا در بررسی مجوز ایمیل:", error);
-                return false;
-            }
-        }
-
-        // بارگیری سوالات از Google Sheets
-        async function loadQuestions() {
-            try {
-                const sheetId = '15B8xmtlFeP1vlT-_0ZhHO3EAzo19l0Gg9ZFIALuHdwk'; // شناسه فایل Google Sheets
-                const gid = '109137920'; // شناسه صفحه (Sheet)
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
-
-                const response = await fetch(url);
-                const text = await response.text();
-                const json = JSON.parse(text.substring(47, text.length - 2)); // پردازش پاسخ JSON
-
-                quizQuestions = json.table.rows.map(row => {
-                    const question = row.c[0].v; // ستون اول: سوال
-                    const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
-                    const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
-                    return { question, options, correctAnswer };
-                });
-
-                console.log("سوالات بارگیری شدند:", quizQuestions); // برای دیباگ
-            } catch (error) {
-                console.error("خطا در بارگیری سوالات:", error);
-            }
-        }
-
-        // تایید ایمیل
-        authButton.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            if (!email) {
-                alert("لطفا ایمیل خود را وارد کنید.");
-                return;
-            }
-
-            try {
-                const isAuthorized = await checkEmailAuthorization(email);
-                if (isAuthorized) {
-                    authContainer.style.display = 'none';
-                    await loadQuestions(); // بارگیری سوالات پس از تایید ایمیل
-                    alert("ایمیل شما تایید شد. حالا می‌توانید آزمون را شروع کنید.");
-                } else {
-                    alert("ایمیل شما مجاز نیست.");
-                }
-            } catch (error) {
-                console.error("خطا در تایید ایمیل:", error);
-                alert("خطا در تایید ایمیل. لطفا دوباره امتحان کنید.");
-            }
+        quizQuestions = json.table.rows.map(row => {
+            const question = row.c[0].v; // ستون اول: سوال
+            const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
+            const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
+            return { question, options, correctAnswer };
         });
 
-        // بقیه کدها مانند قبل
-    </script>
-</body>
-</html>
+        console.log("سوالات بارگیری شدند:", quizQuestions); // برای دیباگ
+    } catch (error) {
+        console.error("خطا در بارگیری سوالات:", error);
+    }
+}
+
+// شروع آزمون
+function startQuiz() {
+    if (quizQuestions.length === 0) {
+        console.error("سوالات بارگیری نشده‌اند!"); // برای دیباگ
+        addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
+        return;
+    }
+    currentQuestionIndex = 0;
+    userScore = 0;
+    chatContainer.innerHTML = ''; // پاک کردن چت قبلی
+    showQuestion(quizQuestions[currentQuestionIndex]);
+}
+
+// نمایش سوال
+function showQuestion(questionData) {
+    console.log("نمایش سوال:", questionData); // برای دیباگ
+    addMessage(questionData.question, 'bot');
+    const optionsDiv = document.createElement('div');
+    optionsDiv.classList.add('options');
+    questionData.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.addEventListener('click', () => handleAnswer(index, questionData));
+        optionsDiv.appendChild(button);
+    });
+    chatContainer.appendChild(optionsDiv);
+}
+
+// رویداد کلیک دکمه شروع آزمون
+startQuizButton.addEventListener('click', () => {
+    console.log("دکمه شروع آزمون کلیک شد!"); // برای دیباگ
+    startQuiz();
+});
+
+// بارگیری سوالات هنگام لود صفحه
+loadQuestions();
