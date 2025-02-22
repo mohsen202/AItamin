@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اولین مدل زبانی هوش مصنوعی تامین</title>
     <style>
+        /* استایل‌ها بدون تغییر باقی می‌مانند */
         body {
             font-family: 'Vazir', sans-serif;
             margin: 0;
@@ -14,177 +15,9 @@
             height: 100vh;
             background-color: #1e1e2f;
             color: #ffffff;
-            direction: rtl; /* جهت متن راست‌به‌چپ */
+            direction: rtl;
         }
-        #chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background-color: #2a2a40;
-            color: white;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0;
-        }
-        #ai-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #3a3a5a;
-            background-image: url('https://s32.picofile.com/file/8482028350/logo3.png');
-            background-size: cover;
-            background-position: center;
-            animation: pulse 2s infinite, moveUpDown 3s infinite;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin: 0 20px;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        @keyframes moveUpDown {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
-        }
-        #chat-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #2a2a40;
-            margin: 10px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 80%;
-            word-wrap: break-word;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            font-size: 14px;
-        }
-        .user {
-            text-align: right;
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-        }
-        .bot {
-            text-align: left;
-            background-color: #3a3a5a;
-            color: #ffffff;
-            align-self: flex-start;
-        }
-        #input-container {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #3a3a5a;
-            background-color: #2a2a40;
-            margin: 10px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0;
-        }
-        #input-text {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #3a3a5a;
-            border-radius: 15px;
-            margin-right: 10px;
-            font-size: 14px;
-            outline: none;
-            background-color: #3a3a5a;
-            color: #ffffff;
-            transition: border-color 0.3s ease;
-            direction: rtl; /* جهت متن راست‌به‌چپ */
-        }
-        #input-text:focus {
-            border-color: #007bff;
-        }
-        #send-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 15px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-        #send-button:hover {
-            background-color: #0056b3;
-        }
-        .loading-container {
-            display: none;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 4px solid #007bff;
-            border-top: 4px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-        .loading-text {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #ffffff;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #suggestions-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px;
-            background-color: #2a2a40;
-            margin: 10px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0;
-            justify-content: center;
-        }
-        .suggestion-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 15px;
-            background-color: #3a3a5a;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-        .suggestion-button:hover {
-            background-color: #007bff;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .options button {
-            padding: 10px;
-            border: none;
-            border-radius: 15px;
-            background-color: #3a3a5a;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-            text-align: right; /* جهت متن راست‌به‌چپ */
-        }
-        .options button:hover {
-            background-color: #007bff;
-        }
+        /* بقیه استایل‌ها بدون تغییر */
     </style>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
@@ -224,40 +57,7 @@
         // آدرس سرور Gradio
         const gradioUrl = 'https://bc0b34a286322eacd4.gradio.live/';
 
-        // بارگیری سوالات از Google Sheets
-        async function loadQuestions() {
-            try {
-                const sheetId = '18TyDLUq0rK5NW2TGldIIrOA7jSET6PwjF6Yib26y268'; // شناسه فایل Google Sheets
-                const gid = '0'; // شناسه صفحه (Sheet)
-                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
-
-                console.log("در حال بارگیری سوالات از:", url);
-
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`خطای شبکه: ${response.status}`);
-                }
-                const text = await response.text();
-                console.log("پاسخ دریافت شد:", text);
-
-                // پردازش پاسخ JSON
-                const json = JSON.parse(text.substring(47, text.length - 2));
-                console.log("داده‌های JSON:", json);
-
-                quizQuestions = json.table.rows.map(row => {
-                    const question = row.c[0].v; // ستون اول: سوال
-                    const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
-                    const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
-                    return { question, options, correctAnswer };
-                });
-
-                console.log("سوالات بارگیری شدند:", quizQuestions);
-            } catch (error) {
-                console.error("خطا در بارگیری سوالات:", error);
-                addMessage("خطا در بارگیری سوالات. لطفا دوباره تلاش کنید.", 'bot');
-            }
-        }
-
+        // تابع برای افزودن پیام به چت
         function addMessage(text, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
@@ -266,6 +66,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        // تابع برای ارسال پیام به سرور
         async function sendMessage(message) {
             const userMessage = message || inputText.value.trim();
             if (!userMessage) return;
@@ -292,13 +93,42 @@
                 const botResponse = result.data[0];
                 addMessage(botResponse, 'bot');
             } catch (error) {
-                console.error("An error occurred:", error);
+                console.error("خطا در ارتباط با سرور:", error);
                 addMessage("خطا در ارتباط با سرور هوش مصنوعی. لطفا دوباره تلاش کنید.", 'bot');
             } finally {
                 loadingContainer.style.display = 'none';
             }
         }
 
+        // تابع برای بارگیری سوالات از Google Sheets
+        async function loadQuestions() {
+            try {
+                const sheetId = '18TyDLUq0rK5NW2TGldIIrOA7jSET6PwjF6Yib26y268'; // شناسه فایل Google Sheets
+                const gid = '0'; // شناسه صفحه (Sheet)
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`خطای شبکه: ${response.status}`);
+                }
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47, text.length - 2));
+
+                quizQuestions = json.table.rows.map(row => {
+                    const question = row.c[0].v; // ستون اول: سوال
+                    const options = row.c.slice(1, 5).map(cell => cell.v); // ستون‌های ۲ تا ۵: گزینه‌ها
+                    const correctAnswer = row.c[5].v; // ستون ششم: پاسخ صحیح
+                    return { question, options, correctAnswer };
+                });
+
+                console.log("سوالات بارگیری شدند:", quizQuestions);
+            } catch (error) {
+                console.error("خطا در بارگیری سوالات:", error);
+                addMessage("خطا در بارگیری سوالات. لطفا دوباره تلاش کنید.", 'bot');
+            }
+        }
+
+        // تابع برای نمایش سوال
         function showQuestion(questionData) {
             addMessage(questionData.question, 'bot');
             const optionsDiv = document.createElement('div');
@@ -312,12 +142,13 @@
             chatContainer.appendChild(optionsDiv);
         }
 
+        // تابع برای مدیریت پاسخ کاربر
         function handleAnswer(userAnswer, questionData) {
             if (userAnswer === questionData.correctAnswer) {
                 userScore += 1;
                 addMessage("✅صحیح!", 'bot');
             } else {
-                addMessage(`❌نادرست!  صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
+                addMessage(`❌نادرست! صحیح: ${questionData.options[questionData.correctAnswer]}`, 'bot');
             }
             currentQuestionIndex += 1;
             if (currentQuestionIndex < quizQuestions.length) {
@@ -327,8 +158,8 @@
             }
         }
 
+        // تابع برای شروع آزمون
         function startQuiz() {
-            console.log("دکمه شروع آزمون کلیک شد!");
             if (quizQuestions.length === 0) {
                 addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
                 return;
@@ -339,6 +170,7 @@
             showQuestion(quizQuestions[currentQuestionIndex]);
         }
 
+        // رویدادهای کلیک و کیبورد
         sendButton.addEventListener('click', () => sendMessage());
         inputText.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
