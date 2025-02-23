@@ -12,7 +12,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #1e1e2f;
+            background-color: #1501fe; /* رنگ پس‌زمینه اصلی */
             color: #ffffff;
             direction: rtl; /* جهت متن راست‌به‌چپ */
         }
@@ -21,11 +21,12 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 20px;
-            background-color: #2a2a40;
+            background-color: rgba(42, 42, 64, 0.9); /* شفافیت برای زیبایی بیشتر */
             color: white;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             flex-shrink: 0;
+            backdrop-filter: blur(10px); /* افکت بلور برای مدرن‌تر شدن */
         }
         #ai-avatar {
             width: 50px;
@@ -51,11 +52,12 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background-color: #2a2a40;
+            background-color: rgba(42, 42, 64, 0.9); /* شفافیت برای زیبایی بیشتر */
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             position: relative;
+            backdrop-filter: blur(10px); /* افکت بلور برای مدرن‌تر شدن */
         }
         .message {
             margin: 10px 0;
@@ -82,11 +84,12 @@
             display: flex;
             padding: 10px;
             border-top: 1px solid #3a3a5a;
-            background-color: #2a2a40;
+            background-color: rgba(42, 42, 64, 0.9); /* شفافیت برای زیبایی بیشتر */
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             flex-shrink: 0;
+            backdrop-filter: blur(10px); /* افکت بلور برای مدرن‌تر شدن */
         }
         #input-text {
             flex: 1;
@@ -145,12 +148,13 @@
             flex-wrap: wrap;
             gap: 10px;
             padding: 10px;
-            background-color: #2a2a40;
+            background-color: rgba(42, 42, 64, 0.9); /* شفافیت برای زیبایی بیشتر */
             margin: 10px;
             border-radius: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             flex-shrink: 0;
             justify-content: center;
+            backdrop-filter: blur(10px); /* افکت بلور برای مدرن‌تر شدن */
         }
         .suggestion-button {
             padding: 10px 20px;
@@ -223,7 +227,7 @@
         let currentQuestionIndex = 0;
         let userScore = 0;
 
-        // اتصال به سرور Gradio///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // اتصال به سرور Gradio
         const client = await Client.connect("https://de127747e46cbb2bd0.gradio.live/");
 
         // بارگیری سوالات از Google Sheets
