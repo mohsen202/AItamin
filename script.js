@@ -11,19 +11,58 @@ let quizQuestions = [];
 let currentQuestionIndex = 0;
 let userScore = 0;
 
+let gradioUrl = ''; // آدرس سرور Gradio
+let googleSheetUrl = ''; // آدرس Google Sheets
+
+// تابع برای خواندن فایل متنی از هاست
+async function readTextFile(filePath) {
+    try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+            throw new Error(`خطای شبکه: ${response.status}`);
+        }
+        const text = await response.text();
+        return text.trim(); // حذف فاصله‌های اضافی
+    } catch (error) {
+        console.error(`خطا در خواندن فایل ${filePath}:`, error);
+        return null;
+    }
+}
+
+// بارگیری آدرس‌ها از فایل‌های متنی
+async function loadUrls() {
+    gradioUrl = await readTextFile('gradio_url.txt');
+    googleSheetUrl = await readTextFile('google_sheet_url.txt');
+
+    if (!gradioUrl || !googleSheetUrl) {
+        console.error("خطا: آدرس‌ها به درستی بارگیری نشدند.");
+        addMessage("خطا در بارگیری آدرس‌ها. لطفا دوباره تلاش کنید.", 'bot');
+        return false;
+    }
+
+    console.log("آدرس Gradio:", gradioUrl);
+    console.log("آدرس Google Sheets:", googleSheetUrl);
+    return true;
+}
+
 // اتصال به سرور Gradio
-const client = await Client.connect("https://7576c4ad0f1a39890b.gradio.live/");
+async function connectToGradio() {
+    try {
+        const client = await Client.connect(gradioUrl);
+        return client;
+    } catch (error) {
+        console.error("خطا در اتصال به سرور Gradio:", error);
+        addMessage("خطا در اتصال به سرور هوش مصنوعی. لطفا دوباره تلاش کنید.", 'bot');
+        return null;
+    }
+}
 
 // بارگیری سوالات از Google Sheets
 async function loadQuestions() {
     try {
-        const sheetId = '18TyDLUq0rK5NW2TGldIIrOA7jSET6PwjF6Yib26y268'; // شناسه فایل Google Sheets
-        const gid = '0'; // شناسه صفحه (Sheet)
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+        console.log("در حال بارگیری سوالات از:", googleSheetUrl);
 
-        console.log("در حال بارگیری سوالات از:", url);
-
-        const response = await fetch(url);
+        const response = await fetch(googleSheetUrl);
         if (!response.ok) {
             throw new Error(`خطای شبکه: ${response.status}`);
         }
@@ -66,6 +105,9 @@ async function sendMessage(message) {
     loadingContainer.style.display = 'block';
 
     try {
+        const client = await connectToGradio();
+        if (!client) return;
+
         const result = await client.predict("/predict", { 
             input_text: userMessage, 
         });
@@ -120,21 +162,26 @@ function startQuiz() {
     showQuestion(quizQuestions[currentQuestionIndex]);
 }
 
-sendButton.addEventListener('click', () => sendMessage());
-inputText.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-});
+// شروع برنامه
+(async function init() {
+    const urlsLoaded = await loadUrls();
+    if (!urlsLoaded) return;
 
-suggestionButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const question = button.getAttribute('data-question');
-        sendMessage(question);
+    await loadQuestions();
+
+    sendButton.addEventListener('click', () => sendMessage());
+    inputText.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
     });
-});
 
-startQuizButton.addEventListener('click', startQuiz);
+    suggestionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const question = button.getAttribute('data-question');
+            sendMessage(question);
+        });
+    });
 
-// بارگیری سوالات هنگام لود صفحه
-loadQuestions();
+    startQuizButton.addEventListener('click', startQuiz);
+})();
