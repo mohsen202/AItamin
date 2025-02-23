@@ -210,6 +210,8 @@
     </div>
 
     <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
+
         const chatContainer = document.getElementById('chat-container');
         const inputText = document.getElementById('input-text');
         const sendButton = document.getElementById('send-button');
@@ -221,8 +223,8 @@
         let currentQuestionIndex = 0;
         let userScore = 0;
 
-        // آدرس سرور Gradio
-        const gradioUrl = 'https://bc0b34a286322eacd4.gradio.live/';
+        // اتصال به سرور Gradio///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        const client = await Client.connect("https://de127747e46cbb2bd0.gradio.live/");
 
         // بارگیری سوالات از Google Sheets
         async function loadQuestions() {
@@ -276,20 +278,11 @@
             loadingContainer.style.display = 'block';
 
             try {
-                const response = await fetch(gradioUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ input_text: userMessage }),
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
                 });
 
-                if (!response.ok) {
-                    throw new Error(`خطای شبکه: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const botResponse = result.data[0];
+                const botResponse = result.data[0]; // Assuming the response is in the first element of the result data
                 addMessage(botResponse, 'bot');
             } catch (error) {
                 console.error("An error occurred:", error);
