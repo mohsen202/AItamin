@@ -124,6 +124,11 @@
             display: none;
             text-align: center;
             margin: 10px 0;
+            position: fixed; /* نمایش منوی شکیبا باشید در بالای صفحه */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000; /* اطمینان از نمایش بالای سایر عناصر */
         }
         .loading-spinner {
             width: 30px;
@@ -165,6 +170,7 @@
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s ease;
+            flex: 1; /* برای نمایش دکمه‌ها در یک ردیف */
         }
         .suggestion-button:hover {
             background-color: #007bff;
@@ -188,6 +194,18 @@
         }
         .options button:hover {
             background-color: #007bff;
+        }
+
+        /* استایل‌های موبایل */
+        @media (max-width: 600px) {
+            #suggestions-container {
+                flex-direction: row; /* نمایش دکمه‌ها در یک ردیف */
+                gap: 5px; /* فاصله کمتر بین دکمه‌ها */
+            }
+            .suggestion-button {
+                font-size: 12px; /* کاهش سایز فونت برای موبایل */
+                padding: 8px 15px; /* کاهش پدینگ */
+            }
         }
     </style>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
