@@ -111,7 +111,7 @@ function handleAnswer(userAnswer, questionData) {
 function startQuiz() {
     console.log("دکمه شروع آزمون کلیک شد!");
     if (quizQuestions.length === 0) {
-        addMessage("خطا: سوالات بارگیری نشده‌اند.", 'bot');
+        addMessage("خطا: سوالات بارگیری نشده‌اند. لطفا صفحه را رفرش کنید.", 'bot');
         return;
     }
     currentQuestionIndex = 0;
