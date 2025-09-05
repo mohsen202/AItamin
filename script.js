@@ -6,7 +6,7 @@ const sendButton = document.getElementById('send-button');
 const loadingContainer = document.getElementById('loading-container');
 const suggestionButtons = document.querySelectorAll('.suggestion-button');
 
-let gradioUrl = 'https://f107ac3b2e6e4c8c93.gradio.live'; // آدرس سرور Gradio
+let gradioUrl = 'https://16c48d5ac81c4be8f8.gradio.live'; // آدرس سرور Gradio
 
 // تابع برای خواندن فایل متنی از هاست
 async function readTextFile(filePath) {
