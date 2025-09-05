@@ -5,7 +5,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #1501fe;
+    background: linear-gradient(135deg, #1501fe, #6200ea);
     color: #ffffff;
     direction: rtl;
 }
@@ -14,117 +14,116 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
-    background-color: rgba(42, 42, 64, 0.9);
+    padding: 15px 25px;
+    background: rgba(42, 42, 64, 0.8);
     color: white;
     border-radius: 0 0 20px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
 }
 
 #ai-avatar {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
-    background-color: #3a3a5a;
-    background-image: url('https://s32.picofile.com/file/8481217200/3.png');
-    background-size: cover;
-    background-position: center;
+    background: url('https://s32.picofile.com/file/8481217200/3.png') center/cover no-repeat;
     animation: pulse 2s infinite, moveUpDown 3s infinite;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     margin: 0 20px;
 }
 
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50% { transform: scale(1.08); }
 }
 
 @keyframes moveUpDown {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(10px); }
+    50% { transform: translateY(8px); }
 }
 
 #chat-container {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background-color: rgba(42, 42, 64, 0.9);
+    background: rgba(42, 42, 64, 0.85);
     margin: 10px;
     border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    position: relative;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(10px);
 }
 
 .message {
     margin: 10px 0;
-    padding: 10px 15px;
-    border-radius: 15px;
+    padding: 12px 16px;
+    border-radius: 18px;
     max-width: 80%;
     word-wrap: break-word;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    animation: fadeIn 0.3s ease;
 }
 
 .user {
-    text-align: right;
-    background-color: #007bff;
-    color: white;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
     align-self: flex-end;
 }
 
 .bot {
-    text-align: left;
-    background-color: #3a3a5a;
-    color: #ffffff;
+    background: #3a3a5a;
+    color: #fff;
     align-self: flex-start;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 #input-container {
     display: flex;
-    padding: 10px;
-    border-top: 1px solid #3a3a5a;
-    background-color: rgba(42, 42, 64, 0.9);
+    padding: 12px;
+    background: rgba(42, 42, 64, 0.85);
     margin: 10px;
     border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    flex-shrink: 0;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
 }
 
 #input-text {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #3a3a5a;
+    padding: 12px;
+    border: none;
     border-radius: 15px;
     margin-right: 10px;
     font-size: 14px;
     outline: none;
-    background-color: #3a3a5a;
-    color: #ffffff;
-    transition: border-color 0.3s ease;
-    direction: rtl;
+    background: #2a2a44;
+    color: #fff;
+    transition: box-shadow 0.3s ease;
 }
 
 #input-text:focus {
-    border-color: #007bff;
+    box-shadow: 0 0 6px #007bff;
 }
 
 #send-button {
-    padding: 10px 20px;
+    padding: 12px 22px;
     border: none;
     border-radius: 15px;
-    background-color: #007bff;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s ease;
+    transition: transform 0.2s ease, background 0.3s ease;
 }
 
 #send-button:hover {
-    background-color: #0056b3;
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #0056b3, #003c82);
 }
 
 .loading-container {
@@ -139,8 +138,8 @@ body {
 }
 
 .loading-spinner {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     border: 4px solid #007bff;
     border-top: 4px solid transparent;
     border-radius: 50%;
@@ -163,12 +162,11 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 10px;
-    background-color: rgba(42, 42, 64, 0.9);
+    padding: 12px;
+    background: rgba(42, 42, 64, 0.85);
     margin: 10px;
     border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     justify-content: center;
     backdrop-filter: blur(10px);
 }
@@ -177,48 +175,21 @@ body {
     padding: 10px 20px;
     border: none;
     border-radius: 15px;
-    background-color: #3a3a5a;
+    background: #3a3a5a;
     color: white;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s ease;
-    flex: 1;
+    transition: all 0.3s ease;
 }
 
 .suggestion-button:hover {
-    background-color: #007bff;
-}
-
-.options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.options button {
-    padding: 10px;
-    border: none;
-    border-radius: 15px;
-    background-color: #3a3a5a;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-    text-align: right;
-}
-
-.options button:hover {
-    background-color: #007bff;
+    background: #007bff;
+    transform: translateY(-2px);
 }
 
 @media (max-width: 600px) {
-    #suggestions-container {
-        flex-direction: row;
-        gap: 5px;
-    }
     .suggestion-button {
         font-size: 12px;
-        padding: 8px 15px;
+        padding: 8px 12px;
     }
 }
