@@ -75,3 +75,4 @@ background:var(--glass);box-shadow:var(--shadow);
 @media (max-width:600px){
 .bubble{max-width:90%}
 }
+
