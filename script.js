@@ -1,94 +1,64 @@
 import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
-
-const chatContainer = document.getElementById('chat-container');
-const inputText = document.getElementById('input-text');
-const sendButton = document.getElementById('send-button');
-const loadingContainer = document.getElementById('loading-container');
-const suggestionButtons = document.querySelectorAll('.suggestion-button');
-
-let gradioUrl = 'https://16c48d5ac81c4be8f8.gradio.live'; // آدرس سرور Gradio
-
-// تابع برای خواندن فایل متنی از هاست
-async function readTextFile(filePath) {
-    try {
-        const response = await fetch(filePath);
-        if (!response.ok) throw new Error(`خطای شبکه: ${response.status}`);
-        const text = await response.text();
-        return text.trim();
-    } catch (error) {
-        console.error(`خطا در خواندن فایل ${filePath}:`, error);
-        return null;
-    }
 }
 
-// بارگیری آدرس سرور
-async function loadUrl() {
-    gradioUrl = await readTextFile('gradio_url.txt');
-    if (!gradioUrl) {
-        addMessage("خطا در بارگیری آدرس. لطفا دوباره تلاش کنید.", 'bot');
-        return false;
-    }
-    return true;
+
+async function sendMessage(message){
+const userMessage = (message ?? inputText.value).trim();
+if(!userMessage) return;
+
+
+addMessage(userMessage, "user");
+inputText.value = "";
+autoResize();
+setLoading(true);
+
+
+try{
+const client = await connect();
+if(!client){ return; }
+
+
+// سازگار با فضای کاری پیش‌فرض Gradio
+const result = await client.predict("/predict", { input_text: userMessage });
+const botResponse = Array.isArray(result?.data) ? result.data[0] : (result?.data ?? "پاسخی دریافت نشد.");
+addMessage(String(botResponse), "bot");
+}catch(err){
+console.error("خطا:", err);
+addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
+}finally{
+setLoading(false);
+}
 }
 
-// اتصال به سرور Gradio
-async function connectToGradio() {
-    try {
-        return await Client.connect(gradioUrl);
-    } catch (error) {
-        console.error("خطا در اتصال به سرور:", error);
-        addMessage("خطا در اتصال به سرور هوش مصنوعی. لطفا دوباره تلاش کنید.", 'bot');
-        return null;
-    }
+
+function autoResize(){
+inputText.style.height = "auto";
+inputText.style.height = Math.min(inputText.scrollHeight, 180) + "px";
 }
 
-// اضافه کردن پیام به چت
-function addMessage(text, sender) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', sender);
-    messageElement.textContent = text;
-    chatContainer.appendChild(messageElement);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+// رویدادها
+sendButton.addEventListener("click", ()=> sendMessage());
+inputText.addEventListener("keydown", (e)=>{
+if(e.key === "Enter" && !e.shiftKey){
+e.preventDefault();
+sendMessage();
 }
+});
+inputText.addEventListener("input", autoResize);
 
-// ارسال پیام
-async function sendMessage(message) {
-    const userMessage = message || inputText.value.trim();
-    if (!userMessage) return;
 
-    addMessage(userMessage, 'user');
-    inputText.value = '';
-    loadingContainer.style.display = 'block';
+suggestionButtons.forEach(btn=> btn.addEventListener("click", ()=>{
+const q = btn.getAttribute("data-question");
+sendMessage(q);
+}));
 
-    try {
-        const client = await connectToGradio();
-        if (!client) return;
 
-        const result = await client.predict("/predict", { input_text: userMessage });
-        const botResponse = result.data[0];
-        addMessage(botResponse, 'bot');
-    } catch (error) {
-        console.error("An error occurred:", error);
-        addMessage("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.", 'bot');
-    } finally {
-        loadingContainer.style.display = 'none';
-    }
-}
+clearBtn?.addEventListener("click", ()=>{
+chatContainer.innerHTML = "";
+addMessage("گفتگوی جدید شروع شد. پرسش خود را بپرسید.", "bot");
+});
 
-// شروع برنامه
-(async function init() {
-    const urlLoaded = await loadUrl();
-    if (!urlLoaded) return;
 
-    sendButton.addEventListener('click', () => sendMessage());
-    inputText.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') sendMessage();
-    });
-
-    suggestionButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const question = button.getAttribute('data-question');
-            sendMessage(question);
-        });
-    });
-})();
+// شروع
+addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
