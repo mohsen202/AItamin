@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>چت‌بات من — متصل به Gradio</title>
+    <title>چت‌بات من — متصل به Gradio (با پروکسی CORS)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
 </head>
 <body>
 
-    <h2>🤖 چت‌بات هوشمند</h2>
+    <h2>🤖 چت‌بات هوشمند (با پروکسی CORS)</h2>
     <div id="chat-box"></div>
     <input type="text" id="user-input" placeholder="پیام خود را بنویسید..." autocomplete="off" />
     <button onclick="sendMessage()">ارسال</button>
@@ -60,7 +60,7 @@
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
-        let chatHistory = []; // ذخیره تاریخچه چت
+        let chatHistory = [];
 
         function appendMessage(message, isUser = false) {
             const msgDiv = document.createElement('div');
@@ -76,13 +76,17 @@
 
             appendMessage(message, true);
             userInput.value = '';
-            const thinkingMsg = appendMessage("در حال پاسخ دادن...", false);
-            const thinkingElement = chatBox.lastChild;
+            const thinkingElement = document.createElement('div');
+            thinkingElement.className = 'bot-msg';
+            thinkingElement.textContent = "در حال پاسخ دادن...";
+            chatBox.appendChild(thinkingElement);
 
-            const apiUrl = 'https://b543ec72cc7961e714.gradio.live/api/predict/';
+            // 🔄 استفاده از پروکسی CORS
+            const targetUrl = 'https://b543ec72cc7961e714.gradio.live/api/predict/';
+            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
 
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -98,16 +102,12 @@
                 }
 
                 const result = await response.json();
-                console.log("Gradio Response:", result);
-
-                // حذف پیام "در حال پاسخ دادن..."
                 chatBox.removeChild(thinkingElement);
 
                 if (result.data && result.data[0]) {
                     const botReply = result.data[0];
                     appendMessage(botReply, false);
 
-                    // آپدیت تاریخچه چت
                     if (result.data[1]) {
                         chatHistory = result.data[1];
                     } else {
@@ -132,7 +132,6 @@
             }
         });
 
-        // پیام خوشامدگویی
         appendMessage("سلام! من ربات هوشمند شما هستم. چطور می‌تونم کمکتون کنم؟", false);
     </script>
 
