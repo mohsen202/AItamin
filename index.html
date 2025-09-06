@@ -48,70 +48,85 @@
         button:hover {
             background: #0056b3;
         }
+        .loading {
+            color: #6c757d;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <h2>🤖 چت‌بات من</h2>
+    <h2>🤖 چت‌بات من (با پشتیبانی از تاریخچه)</h2>
     <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="پیام خود را بنویسید..." />
+    <input type="text" id="user-input" placeholder="پیام خود را بنویسید..." autocomplete="off" />
     <button onclick="sendMessage()">ارسال</button>
 
     <script>
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
+        let chatHistory = []; // ذخیره تاریخچه چت به صورت [ [user_msg, bot_reply], ... ]
 
         function appendMessage(message, isUser = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = isUser ? 'user-msg' : 'bot-msg';
             msgDiv.textContent = message;
             chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight; // اسکرول به آخر
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
 
-            // نمایش پیام کاربر
             appendMessage(message, true);
             userInput.value = '';
 
-            // نمایش "در حال تایپ..."
-            appendMessage("در حال پاسخ دادن...", false);
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'bot-msg loading';
+            loadingDiv.textContent = "در حال پاسخ دادن...";
+            chatBox.appendChild(loadingDiv);
 
             try {
-                // ارسال به API گرادیو
+                // ارسال پیام + تاریخچه
                 const response = await fetch('https://b543ec72cc7961e714.gradio.live/run/predict', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        data: [message] // فرض بر این است که مدل فقط یک ورودی متنی دارد
+                        data: [
+                            message,     // پیام جدید کاربر
+                            chatHistory  // تاریخچه قبلی
+                        ]
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const result = await response.json();
 
-                // حذف پیام "در حال تایپ..."
-                chatBox.removeChild(chatBox.lastChild);
+                // حذف "در حال پاسخ دادن..."
+                chatBox.removeChild(loadingDiv);
 
-                if (result && result.data && result.data.length > 0) {
-                    // فرض می‌کنیم خروجی در data[0] قرار دارد
-                    appendMessage(result.data[0], false);
+                if (result && result.data && result.data.length >= 2) {
+                    const botReply = result.data[0];     // پاسخ جدید ربات
+                    chatHistory = result.data[1];        // تاریخچه به‌روز شده
+
+                    appendMessage(botReply, false);
                 } else {
-                    appendMessage("خطا: پاسخی دریافت نشد.", false);
+                    appendMessage("⚠️ ساختار پاسخ از سرور نامعتبر است.", false);
+                    console.log("Response data:", result);
                 }
 
             } catch (error) {
-                chatBox.removeChild(chatBox.lastChild);
+                chatBox.removeChild(loadingDiv);
                 appendMessage("❌ خطا در ارتباط با سرور", false);
                 console.error("Error:", error);
             }
         }
 
-        // ارسال با زدن Enter
         userInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
