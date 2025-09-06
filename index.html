@@ -7,6 +7,7 @@
   <title>تأمین — دستیار هوشمند</title>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
   <style>
+    /* استایل‌ها بدون تغییر باقی می‌مانند */
     :root{
       --bg: #0b0c17;
       --card: rgba(255,255,255,0.06);
@@ -121,8 +122,6 @@
   </footer>
 
   <script type="module">
-    import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
-
     const chatContainer = document.getElementById("chat-container");
     const inputText = document.getElementById("input-text");
     const sendButton = document.getElementById("send-button");
@@ -131,8 +130,7 @@
     const clearBtn = document.getElementById("clear-chat");
 
     const GRADIO_URL = "https://978f8dfa49a0f5f565.gradio.live";
-    let gradioClient = null;
-    let isConnecting = false;
+    const API_URL = `${GRADIO_URL}/api/predict`;
 
     function nowTime(){
       const d = new Date();
@@ -175,25 +173,48 @@
       inputText.disabled = state;
     }
 
-    async function connect(){
-      if(gradioClient) return gradioClient;
-      if(isConnecting) {
-        // منتظر بمان تا اتصال قبلی کامل شود
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return gradioClient;
+    // روش 1: استفاده از fetch مستقیم به API Gradio
+    async function sendWithFetch(message) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            data: [message],
+            fn_index: 0
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`خطای HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('پاسخ سرور:', result);
+        
+        if (result && result.data && result.data.length > 0) {
+          return result.data[0];
+        }
+        return "پاسخی دریافت نشد.";
+      } catch (error) {
+        console.error('خطا در ارسال با fetch:', error);
+        throw error;
       }
-      
-      isConnecting = true;
-      try{
-        gradioClient = await Client.connect(GRADIO_URL);
-        console.log("اتصال به سرور Gradio برقرار شد");
-        return gradioClient;
-      }catch(err){
-        console.error("خطا در اتصال به سرور:", err);
-        addMessage("خطا در اتصال به سرور هوش مصنوعی. لطفاً بعداً تلاش کنید.", "bot");
-        return null;
-      }finally{
-        isConnecting = false;
+    }
+
+    // روش 2: استفاده از Gradio Client (اگر در دسترس باشد)
+    async function sendWithGradioClient(message) {
+      try {
+        // بارگذاری پویای کتابخانه Gradio Client
+        const { Client } = await import("https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js");
+        const client = await Client.connect(GRADIO_URL);
+        const result = await client.predict("/predict", { input_text: message });
+        return result?.data || "پاسخی دریافت نشد.";
+      } catch (error) {
+        console.error('خطا در ارسال با Gradio Client:', error);
+        throw error;
       }
     }
 
@@ -206,48 +227,32 @@
       autoResize();
       setLoading(true);
       
-      try{
-        const client = await connect();
-        if(!client){ 
-          setLoading(false);
-          return; 
+      try {
+        let botResponse;
+        
+        // ابتدا با fetch امتحان کنید
+        try {
+          botResponse = await sendWithFetch(userMessage);
+        } catch (fetchError) {
+          console.log('fetch ناموفق بود، تلاش با Gradio Client...');
+          // اگر fetch شکست خورد، با Gradio Client امتحان کنید
+          botResponse = await sendWithGradioClient(userMessage);
         }
         
-        // بررسی ساختار API Gradio
-        const app = await client.view();
-        console.log("اطلاعات API:", app);
+        addMessage(String(botResponse), "bot");
         
-        // پیدا کردن endpoint صحیح
-        let endpoint = "/predict";
-        if (app.named_endpoints && app.named_endpoints.length > 0) {
-          endpoint = app.named_endpoints[0];
+      } catch (err) {
+        console.error("خطای نهایی:", err);
+        
+        // بررسی نوع خطا
+        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+          addMessage("خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.", "bot");
+        } else if (err.message.includes('CORS') || err.message.includes('اصلی')) {
+          addMessage("مشکل امنیتی در ارتباط با سرور. لطفاً با پشتیبانی تماس بگیرید.", "bot");
+        } else {
+          addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
         }
-        
-        console.log("استفاده از endpoint:", endpoint);
-        
-        // ارسال درخواست با ساختار صحیح
-        const result = await client.predict(endpoint, [userMessage]);
-        
-        // پردازش پاسخ‌های مختلف
-        let botResponse = "پاسخی دریافت نشد.";
-        
-        if (result && typeof result === 'object') {
-          // بررسی ساختارهای مختلف پاسخ
-          if (result.data) {
-            botResponse = Array.isArray(result.data) ? result.data.join(" ") : String(result.data);
-          } else if (Array.isArray(result) && result.length > 0) {
-            botResponse = String(result[0]);
-          } else if (typeof result === 'string') {
-            botResponse = result;
-          }
-        }
-        
-        addMessage(botResponse, "bot");
-        
-      }catch(err){
-        console.error("خطا در ارسال پیام:", err);
-        addMessage("مشکلی در ارتباط با سرور پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
-      }finally{
+      } finally {
         setLoading(false);
       }
     }
@@ -275,8 +280,25 @@
       addMessage("گفتگوی جدید شروع شد. پرسش خود را بپرسید.", "bot");
     });
 
-    // پیام خوشامدگویی
-    addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
+    // تست اتصال اولیه
+    async function testConnection() {
+      try {
+        const response = await fetch(GRADIO_URL);
+        if (response.ok) {
+          console.log('اتصال به سرور برقرار است');
+          addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
+        } else {
+          console.log('سرور پاسخ نمی‌دهد');
+          addMessage("سرور در دسترس نیست. لطفاً بعداً تلاش کنید.", "bot");
+        }
+      } catch (error) {
+        console.error('خطا در تست اتصال:', error);
+        addMessage("خطا در ارتباط با سرور. لطفاً اتصال اینترنت را بررسی کنید.", "bot");
+      }
+    }
+
+    // اجرای تست اتصال هنگام بارگذاری
+    testConnection();
   </script>
 </body>
 </html>
