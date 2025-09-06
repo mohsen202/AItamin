@@ -1,591 +1,235 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0f1020" />
-  <title>تأمین — دستیار هوشمند</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #0b0c17;
-      --card: rgba(255,255,255,0.06);
-      --glass: rgba(255,255,255,0.08);
-      --text: #eef0ff;
-      --muted: #b9bde5;
-      --brand-1: #6a7bff;
-      --brand-2: #9a5cff;
-      --accent: #22e0a2;
-      --danger: #ff6b6b;
-      --radius: 16px;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --user-bubble: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-      --bot-bubble: rgba(255,255,255,.06);
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    html, body {
-      height: 100%;
-      font-family: 'Sahel', 'Vazir', system-ui, sans-serif;
-    }
-    
-    body {
-      margin: 0;
-      background: radial-gradient(1200px 600px at 90% -10%, #1a0f3d 0%, transparent 60%),
-                  radial-gradient(900px 500px at -10% 110%, #093a46 0%, transparent 55%),
-                  linear-gradient(180deg, #0b0c17 0%, #0f1020 100%);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      line-height: 1.6;
-    }
-    
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      background: linear-gradient(180deg, rgba(15,16,32,.9), rgba(15,16,32,.6));
-      backdrop-filter: saturate(140%) blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    
-    .brand {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: conic-gradient(from 210deg, var(--brand-1), var(--brand-2));
-      box-shadow: inset 0 0 20px rgba(255,255,255,.15), 0 8px 22px rgba(0,0,0,.35);
-      position: relative;
-    }
-    
-    .logo::after {
-      content: "";
-      position: absolute;
-      inset: 5px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff3, #0000);
-    }
-    
-    .titles h1 {
-      font-size: 18px;
-      margin: 0;
-      font-weight: 700;
-    }
-    
-    .titles .subtitle {
-      margin: 2px 0 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-    
-    .header-actions .ghost {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,.14);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-    }
-    
-    .header-actions .ghost:hover {
-      border-color: rgba(255,255,255,.3);
-      background: rgba(255,255,255,.05);
-    }
-    
-    .app-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 920px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 16px;
-    }
-    
-    .chat {
-      flex: 1;
-      overflow: auto;
-      padding: 16px;
-      border-radius: var(--radius);
-      background: var(--glass);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    
-    .message {
-      display: flex;
-      gap: 12px;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .message.user {
-      justify-content: flex-end;
-    }
-    
-    .message.bot {
-      justify-content: flex-start;
-    }
-    
-    .message-content {
-      max-width: 75%;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .message.user .message-content {
-      align-items: flex-end;
-    }
-    
-    .message.bot .message-content {
-      align-items: flex-start;
-    }
-    
-    .bubble {
-      padding: 14px 16px;
-      border-radius: 18px;
-      line-height: 1.7;
-      font-size: 15px;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .message.user .bubble {
-      background: var(--user-bubble);
-      color: #fff;
-      border-bottom-left-radius: 6px;
-      text-align: right;
-    }
-    
-    .message.bot .bubble {
-      background: var(--bot-bubble);
-      border: 1px solid rgba(255,255,255,.08);
-      color: var(--text);
-      border-bottom-right-radius: 6px;
-      text-align: right;
-    }
-    
-    .timestamp {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
-      direction: ltr;
-    }
-    
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      flex: 0 0 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    
-    .message.bot .avatar {
-      background: linear-gradient(135deg, #4c5bff, #22e0a2);
-    }
-    
-    .message.user .avatar {
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-    }
-    
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 10px;
-    }
-    
-    .chip {
-      border: none;
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      padding: 10px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      transition: all 0.2s ease;
-    }
-    
-    .chip:hover {
-      background: rgba(255,255,255,.14);
-      transform: translateY(-2px);
-    }
-    
-    .composer {
-      position: sticky;
-      bottom: 0;
-      padding: 16px;
-      background: linear-gradient(0deg, rgba(15,16,32,.95), rgba(15,16,32,.7));
-      backdrop-filter: saturate(140%) blur(12px);
-      border-top: 1px solid rgba(255,255,255,.06);
-    }
-    
-    .loading {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      margin: 8px 0 12px 0;
-    }
-    
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border: 3px solid rgba(255,255,255,.2);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    .loading-text {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-    
-    #input-text {
-      flex: 1;
-      resize: none;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.1);
-      color: var(--text);
-      padding: 14px 16px;
-      border-radius: 16px;
-      outline: none;
-      text-align: right;
-      font-family: inherit;
-      font-size: 15px;
-      min-height: 50px;
-      max-height: 150px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    #input-text:focus {
-      border-color: var(--brand-1);
-      box-shadow: 0 0 0 3px rgba(106, 123, 255, 0.15);
-    }
-    
-    #input-text::placeholder {
-      color: var(--muted);
-    }
-    
-    .primary {
-      border: none;
-      padding: 12px 20px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-      color: #fff;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      height: 50px;
-    }
-    
-    .primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(106, 123, 255, 0.25);
-    }
-    
-    .primary:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: none; }
-    }
-    
-    /* responsive styles */
-    @media (max-width: 768px) {
-      .message-content {
-        max-width: 85%;
-      }
-      
-      .bubble {
-        padding: 12px 14px;
-        font-size: 14px;
-      }
-      
-      .app-header {
-        padding: 12px 16px;
-      }
-      
-      .logo {
-        width: 40px;
-        height: 40px;
-      }
-      
-      .titles h1 {
-        font-size: 16px;
-      }
-      
-      .chip {
-        padding: 8px 14px;
-        font-size: 12px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .app-main {
-        padding: 12px;
-      }
-      
-      .chat {
-        padding: 12px;
-      }
-      
-      .message-content {
-        max-width: 90%;
-      }
-      
-      .avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 12px;
-      }
-      
-      .composer {
-        padding: 12px;
-      }
-      
-      #input-text {
-        padding: 12px 14px;
-        font-size: 14px;
-      }
-      
-      .primary {
-        padding: 10px 16px;
-        height: 46px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اولین مدل زبانی هوش مصنوعی*تامین* نسخه آزمایشی</title>
+    <style>
+        body {
+            font-family: 'Vazir', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #1e1e2f;
+            color: #ffffff;
+        }
+        #chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: #2a2a40;
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #ai-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #3a3a5a;
+            background-image: url('https://s32.picofile.com/file/8482028350/logo3.png'); /* Replace with your AI avatar URL */
+            background-size: cover;
+            background-position: center;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        #chat-container {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+        .user {
+            text-align: right;
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot {
+            text-align: left;
+            background-color: #3a3a5a;
+            color: #ffffff;
+            align-self: flex-start;
+        }
+        #input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #3a3a5a;
+            background-color: #2a2a40;
+            margin: 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #input-text {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #3a3a5a;
+            border-radius: 15px;
+            margin-right: 10px;
+            font-size: 14px;
+            outline: none;
+            background-color: #3a3a5a;
+            color: #ffffff;
+            transition: border-color 0.3s ease;
+        }
+        #input-text:focus {
+            border-color: #007bff;
+        }
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        /* Loading Spinner and Message */
+        .loading-container {
+            display: none; /* Hidden by default */
+            text-align: center;
+            margin: 10px 0;
+        }
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid #007bff;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        .loading-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media (max-width: 600px) {
+            #chat-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            #ai-avatar {
+                margin-bottom: 10px;
+            }
+            #chat-container {
+                margin: 5px;
+                padding: 5px;
+            }
+            .message {
+                max-width: 90%;
+                font-size: 12px;
+            }
+            #input-container {
+                flex-direction: column;
+                padding: 5px;
+            }
+            #input-text {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            #send-button {
+                width: 100%;
+            }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/vazir-font/dist/font-face.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-  <header class="app-header">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div class="titles">
-        <h1>دستیار هوشمند تأمین</h1>
-        <p class="subtitle">نسخه آزمایشی • تجربه‌ای سریع و سبک</p>
-      </div>
+    <div id="chat-header">
+        <div id="ai-avatar"></div>
+        <h2 style="margin-left: 5px; font-size: 16px;">اولین مدل زبانی هوش مصنوعی*تامین* نسخه آزمایشی</h2>
     </div>
-    <div class="header-actions">
-      <button id="clear-chat" class="ghost" title="پاک‌سازی گفتگو">پاک‌سازی</button>
+    <div id="chat-container">
+        <!-- Loading container for "لطفا شکیبا باشید" -->
+        <div class="loading-container" id="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">لطفا شکیبا باشید...</div>
+        </div>
     </div>
-  </header>
-
-  <main class="app-main">
-    <section id="chat-container" class="chat"></section>
-
-    <section id="suggestions-container" class="suggestions" aria-label="پیشنهادهای آماده">
-      <button class="chip" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
-      <button class="chip" data-question="بیمه زنان خانه‌دار چیست و شرایط آن؟">بیمه زنان خانه‌دار چیست و شرایط آن؟</button>
-      <button class="chip" data-question="هدف از ارسال پیامک ماهانه چیست؟">هدف از ارسال پیامک ماهانه چیست؟</button>
-    </section>
-  </main>
-
-  <footer class="composer">
-    <div id="loading-container" class="loading" role="status" aria-live="polite" aria-atomic="true">
-      <span class="spinner" aria-hidden="true"></span>
-      <span class="loading-text">در حال فکر کردن…</span>
+    <div id="input-container">
+        <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
+        <button id="send-button">ارسال</button>
     </div>
-    <div class="input-row">
-      <textarea id="input-text" rows="1" placeholder="سؤال خود را بنویسید… (Enter برای ارسال، Shift+Enter برای رفتن به خط بعد)"></textarea>
-      <button id="send-button" class="primary" aria-label="ارسال پیام">ارسال</button>
-    </div>
-  </footer>
 
-  <script>
-    const chatContainer = document.getElementById("chat-container");
-    const inputText = document.getElementById("input-text");
-    const sendButton = document.getElementById("send-button");
-    const loadingContainer = document.getElementById("loading-container");
-    const suggestionButtons = document.querySelectorAll(".chip");
-    const clearBtn = document.getElementById("clear-chat");
+    <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
 
-    // آدرس Gradio - باید با آدرس real-time کولب جایگزین شود
-    const GRADIO_URL = "https://7a4a1e9e74428b25e4.gradio.live"; // این آدرس را تغییر دهید
+        const client = await Client.connect("https://146f01b16a86da8d51.gradio.live/");
 
-    function nowTime(){
-      const d = new Date();
-      return d.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
-    }
+        const chatContainer = document.getElementById('chat-container');
+        const inputText = document.getElementById('input-text');
+        const sendButton = document.getElementById('send-button');
+        const loadingContainer = document.getElementById('loading-container'); // Loading container
 
-    function createMessageEl(text, role){
-      const wrap = document.createElement("div");
-      wrap.className = `message ${role}`;
-      
-      const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.textContent = role === "bot" ? "ربات" : "شما";
-      
-      const messageContent = document.createElement("div");
-      messageContent.className = "message-content";
-      
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
-      bubble.textContent = text;
-      
-      const meta = document.createElement("div");
-      meta.className = "timestamp";
-      meta.textContent = nowTime();
-      
-      messageContent.appendChild(bubble);
-      messageContent.appendChild(meta);
-      
-      if(role === "user"){
-        wrap.appendChild(messageContent);
-        wrap.appendChild(avatar);
-      } else {
-        wrap.appendChild(avatar);
-        wrap.appendChild(messageContent);
-      }
-      
-      return wrap;
-    }
-
-    function addMessage(text, role){
-      const el = createMessageEl(text, role);
-      chatContainer.appendChild(el);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function setLoading(state){
-      loadingContainer.style.display = state ? "flex" : "none";
-      sendButton.disabled = state;
-      inputText.disabled = state;
-    }
-
-    // شبیه‌سازی پاسخ سرور (برای زمانی که backend در دسترس نیست)
-    function getMockResponse(message) {
-      const responses = {
-        "سلام": "سلام! چطور می‌تونم کمک تون کنم؟",
-        "بیمه دانشجویان": "برای بیمه دانشجویان باید به نزدیکترین شعبه تأمین اجتماعی مراجعه کنید.",
-        "بیمه زنان خانه‌دار": "بیمه زنان خانه‌دار با ارائه مدارک شناسایی و پرداخت حق بیمه امکان‌پذیر است.",
-        "پیامک ماهانه": "پیامک ماهانه برای اطلاع‌رسانی وضعیت بیمه و خدمات ارسال می‌شود."
-      };
-      
-      for (const key in responses) {
-        if (message.includes(key)) {
-          return responses[key];
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-      }
-      
-      return "متأسفانه اطلاعات کافی در این زمینه ندارم. لطفاً با شعبه تأمین اجتماعی تماس بگیرید.";
-    }
 
-    async function sendMessage(message){
-      const userMessage = (message ?? inputText.value).trim();
-      if(!userMessage) return;
-      
-      addMessage(userMessage, "user");
-      inputText.value = "";
-      autoResize();
-      setLoading(true);
-      
-      try {
-        // در اینجا باید به Gradio backend متصل شویم
-        // اگر backend در دسترس نیست، از پاسخ شبیه‌سازی شده استفاده می‌کنیم
-        let botResponse;
-        
-        try {
-          // تلاش برای اتصال به Gradio
-          const response = await fetch(GRADIO_URL + "/api/predict", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              data: [userMessage],
-              fn_index: 0
-            })
-          });
-          
-          if (response.ok) {
-            const result = await response.json();
-            botResponse = result.data[0];
-          } else {
-            throw new Error("خطا در پاسخ سرور");
-          }
-        } catch (error) {
-          console.error("خطا در ارتباط با سرور:", error);
-          // استفاده از پاسخ شبیه‌سازی شده در صورت عدم دسترسی به سرور
-          botResponse = getMockResponse(userMessage);
+        async function sendMessage() {
+            const userMessage = inputText.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, 'user');
+            inputText.value = '';
+
+            // Show loading spinner and text
+            loadingContainer.style.display = 'block';
+
+            try {
+                const result = await client.predict("/predict", { 
+                    input_text: userMessage, 
+                });
+
+                const botResponse = result.data[0]; // Assuming the response is in the first element of the result data
+                addMessage(botResponse, 'bot');
+            } catch (error) {
+                console.error("An error occurred:", error);
+                addMessage("خطا رخ داد. سرور ران نیست! لطفا با ادمین تماس بگیرید", 'bot');
+            } finally {
+                // Hide loading spinner and text
+                loadingContainer.style.display = 'none';
+            }
         }
-        
-        addMessage(botResponse, "bot");
-        
-      } catch (err) {
-        console.error("خطای نهایی:", err);
-        addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
-      } finally {
-        setLoading(false);
-      }
-    }
 
-    function autoResize(){
-      inputText.style.height = "auto";
-      inputText.style.height = Math.min(inputText.scrollHeight, 150) + "px";
-    }
-
-    // رویدادها
-    sendButton.addEventListener("click", ()=> sendMessage());
-    inputText.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" && !e.shiftKey){
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-    inputText.addEventListener("input", autoResize);
-    suggestionButtons.forEach(btn=> btn.addEventListener("click", ()=>{
-      const q = btn.getAttribute("data-question");
-      sendMessage(q);
-    }));
-    clearBtn?.addEventListener("click", ()=>{
-      chatContainer.innerHTML = "";
-      addMessage("گفتگوی جدید شروع شد. پرسش خود را بپرسید.", "bot");
-    });
-
-    // پیام خوشامدگویی
-    addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
-  </script>
+        sendButton.addEventListener('click', sendMessage);
+        inputText.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
 </body>
 </html>
