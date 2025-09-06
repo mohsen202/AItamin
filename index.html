@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -133,6 +132,7 @@
 
     const GRADIO_URL = "https://c4301c6c95d6bcbffd.gradio.live";
     let gradioClient = null;
+    let isConnecting = false;
 
     function nowTime(){
       const d = new Date();
@@ -172,36 +172,81 @@
     function setLoading(state){
       loadingContainer.style.display = state ? "flex" : "none";
       sendButton.disabled = state;
+      inputText.disabled = state;
     }
 
     async function connect(){
       if(gradioClient) return gradioClient;
+      if(isConnecting) {
+        // منتظر بمان تا اتصال قبلی کامل شود
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return gradioClient;
+      }
+      
+      isConnecting = true;
       try{
         gradioClient = await Client.connect(GRADIO_URL);
+        console.log("اتصال به سرور Gradio برقرار شد");
         return gradioClient;
       }catch(err){
         console.error("خطا در اتصال به سرور:", err);
         addMessage("خطا در اتصال به سرور هوش مصنوعی. لطفاً بعداً تلاش کنید.", "bot");
         return null;
+      }finally{
+        isConnecting = false;
       }
     }
 
     async function sendMessage(message){
       const userMessage = (message ?? inputText.value).trim();
       if(!userMessage) return;
+      
       addMessage(userMessage, "user");
       inputText.value = "";
       autoResize();
       setLoading(true);
+      
       try{
         const client = await connect();
-        if(!client){ return; }
-        const result = await client.predict("/predict", { input_text: userMessage });
-        const botResponse = result?.data ? (Array.isArray(result.data) ? result.data.join(" ") : result.data) : "پاسخی دریافت نشد.";
-        addMessage(String(botResponse), "bot");
+        if(!client){ 
+          setLoading(false);
+          return; 
+        }
+        
+        // بررسی ساختار API Gradio
+        const app = await client.view();
+        console.log("اطلاعات API:", app);
+        
+        // پیدا کردن endpoint صحیح
+        let endpoint = "/predict";
+        if (app.named_endpoints && app.named_endpoints.length > 0) {
+          endpoint = app.named_endpoints[0];
+        }
+        
+        console.log("استفاده از endpoint:", endpoint);
+        
+        // ارسال درخواست با ساختار صحیح
+        const result = await client.predict(endpoint, [userMessage]);
+        
+        // پردازش پاسخ‌های مختلف
+        let botResponse = "پاسخی دریافت نشد.";
+        
+        if (result && typeof result === 'object') {
+          // بررسی ساختارهای مختلف پاسخ
+          if (result.data) {
+            botResponse = Array.isArray(result.data) ? result.data.join(" ") : String(result.data);
+          } else if (Array.isArray(result) && result.length > 0) {
+            botResponse = String(result[0]);
+          } else if (typeof result === 'string') {
+            botResponse = result;
+          }
+        }
+        
+        addMessage(botResponse, "bot");
+        
       }catch(err){
-        console.error("خطا:", err);
-        addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
+        console.error("خطا در ارسال پیام:", err);
+        addMessage("مشکلی در ارتباط با سرور پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
       }finally{
         setLoading(false);
       }
@@ -212,6 +257,7 @@
       inputText.style.height = Math.min(inputText.scrollHeight, 180) + "px";
     }
 
+    // رویدادها
     sendButton.addEventListener("click", ()=> sendMessage());
     inputText.addEventListener("keydown", (e)=>{
       if(e.key === "Enter" && !e.shiftKey){
@@ -229,8 +275,8 @@
       addMessage("گفتگوی جدید شروع شد. پرسش خود را بپرسید.", "bot");
     });
 
+    // پیام خوشامدگویی
     addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
   </script>
 </body>
 </html>
-```
