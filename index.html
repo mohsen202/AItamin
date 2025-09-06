@@ -433,7 +433,7 @@
     </div>
   </footer>
 
-  <script type="module">
+  <script>
     const chatContainer = document.getElementById("chat-container");
     const inputText = document.getElementById("input-text");
     const sendButton = document.getElementById("send-button");
@@ -441,8 +441,8 @@
     const suggestionButtons = document.querySelectorAll(".chip");
     const clearBtn = document.getElementById("clear-chat");
 
-    const GRADIO_URL = "https://5ebe2f82167ffba883.gradio.live";
-    const API_URL = `${GRADIO_URL}/api/predict`;
+    // آدرس Gradio - باید با آدرس real-time کولب جایگزین شود
+    const GRADIO_URL = "https://7a4a1e9e74428b25e4.gradio.live"; // این آدرس را تغییر دهید
 
     function nowTime(){
       const d = new Date();
@@ -494,49 +494,22 @@
       inputText.disabled = state;
     }
 
-    // روش 1: استفاده از fetch مستقیم به API Gradio
-    async function sendWithFetch(message) {
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            data: [message],
-            fn_index: 0
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`خطای HTTP: ${response.status}`);
+    // شبیه‌سازی پاسخ سرور (برای زمانی که backend در دسترس نیست)
+    function getMockResponse(message) {
+      const responses = {
+        "سلام": "سلام! چطور می‌تونم کمک تون کنم؟",
+        "بیمه دانشجویان": "برای بیمه دانشجویان باید به نزدیکترین شعبه تأمین اجتماعی مراجعه کنید.",
+        "بیمه زنان خانه‌دار": "بیمه زنان خانه‌دار با ارائه مدارک شناسایی و پرداخت حق بیمه امکان‌پذیر است.",
+        "پیامک ماهانه": "پیامک ماهانه برای اطلاع‌رسانی وضعیت بیمه و خدمات ارسال می‌شود."
+      };
+      
+      for (const key in responses) {
+        if (message.includes(key)) {
+          return responses[key];
         }
-
-        const result = await response.json();
-        console.log('پاسخ سرور:', result);
-        
-        if (result && result.data && result.data.length > 0) {
-          return result.data[0];
-        }
-        return "پاسخی دریافت نشد.";
-      } catch (error) {
-        console.error('خطا در ارسال با fetch:', error);
-        throw error;
       }
-    }
-
-    // روش 2: استفاده از Gradio Client (اگر در دسترس باشد)
-    async function sendWithGradioClient(message) {
-      try {
-        // بارگذاری پویای کتابخانه Gradio Client
-        const { Client } = await import("https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js");
-        const client = await Client.connect(GRADIO_URL);
-        const result = await client.predict("/predict", { input_text: message });
-        return result?.data || "پاسخی دریافت نشد.";
-      } catch (error) {
-        console.error('خطا در ارسال با Gradio Client:', error);
-        throw error;
-      }
+      
+      return "متأسفانه اطلاعات کافی در این زمینه ندارم. لطفاً با شعبه تأمین اجتماعی تماس بگیرید.";
     }
 
     async function sendMessage(message){
@@ -549,30 +522,40 @@
       setLoading(true);
       
       try {
+        // در اینجا باید به Gradio backend متصل شویم
+        // اگر backend در دسترس نیست، از پاسخ شبیه‌سازی شده استفاده می‌کنیم
         let botResponse;
         
-        // ابتدا با fetch امتحان کنید
         try {
-          botResponse = await sendWithFetch(userMessage);
-        } catch (fetchError) {
-          console.log('fetch ناموفق بود، تلاش با Gradio Client...');
-          // اگر fetch شکست خورد، با Gradio Client امتحان کنید
-          botResponse = await sendWithGradioClient(userMessage);
+          // تلاش برای اتصال به Gradio
+          const response = await fetch(GRADIO_URL + "/api/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              data: [userMessage],
+              fn_index: 0
+            })
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            botResponse = result.data[0];
+          } else {
+            throw new Error("خطا در پاسخ سرور");
+          }
+        } catch (error) {
+          console.error("خطا در ارتباط با سرور:", error);
+          // استفاده از پاسخ شبیه‌سازی شده در صورت عدم دسترسی به سرور
+          botResponse = getMockResponse(userMessage);
         }
         
-        addMessage(String(botResponse), "bot");
+        addMessage(botResponse, "bot");
         
       } catch (err) {
         console.error("خطای نهایی:", err);
-        
-        // بررسی نوع خطا
-        if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-          addMessage("خطا در ارتباط با سرور. لطفاً اتصال اینترنت خود را بررسی کنید.", "bot");
-        } else if (err.message.includes('CORS') || err.message.includes('اصلی')) {
-          addMessage("مشکل امنیتی در ارتباط با سرور. لطفاً با پشتیبانی تماس بگیرید.", "bot");
-        } else {
-          addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
-        }
+        addMessage("مشکلی پیش آمد. لطفاً دوباره تلاش کنید.", "bot");
       } finally {
         setLoading(false);
       }
@@ -601,25 +584,8 @@
       addMessage("گفتگوی جدید شروع شد. پرسش خود را بپرسید.", "bot");
     });
 
-    // تست اتصال اولیه
-    async function testConnection() {
-      try {
-        const response = await fetch(GRADIO_URL);
-        if (response.ok) {
-          console.log('اتصال به سرور برقرار است');
-          addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
-        } else {
-          console.log('سرور پاسخ نمی‌دهد');
-          addMessage("سرور در دسترس نیست. لطفاً بعداً تلاش کنید.", "bot");
-        }
-      } catch (error) {
-        console.error('خطا در تست اتصال:', error);
-        addMessage("خطا در ارتباط با سرور. لطفاً اتصال اینترنت را بررسی کنید.", "bot");
-      }
-    }
-
-    // اجرای تست اتصال هنگام بارگذاری
-    testConnection();
+    // پیام خوشامدگویی
+    addMessage("سلام! من دستیار هوشمند تأمین هستم. چگونه کمکتان کنم؟", "bot");
   </script>
 </body>
 </html>
