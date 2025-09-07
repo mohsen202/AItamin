@@ -1,141 +1,121 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>چت‌بات – اتصال به Gradio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>چت‌بات Gradio</title>
   <style>
-    :root{
-      --bg:#0f1220;
-      --panel:#171a2b;
-      --text:#e9ecf1;
-      --muted:#9aa4b2;
-      --accent:#7c7cff;
-      --accent-2:#00e0a4;
-      --border:#252942;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius:22px;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f1220;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:radial-gradient(1200px 800px at 10% -10%, #23284a 0%, transparent 60%),
-               radial-gradient(1000px 700px at 110% 10%, #1b2040 0%, transparent 55%),
-               var(--bg);
-      color:var(--text); font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Segoe UI Emoji";
-      display:flex; align-items:center; justify-content:center; padding:24px;
+    .chat-container {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .shell{
-      width: min(1200px, 100%);
-      height: min(820px, calc(100vh - 48px));
-      display:flex; flex-direction:column; gap:14px;
-      padding:16px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid var(--border); border-radius:28px; box-shadow:var(--shadow); backdrop-filter: blur(8px);
+    .msg {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 15px;
+      line-height: 1.5;
     }
-    .header{
-      display:flex; align-items:center; gap:12px; justify-content:space-between;
-      padding:12px 14px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    .user {
+      align-self: flex-start;
+      background: #1f6feb;
     }
-    .title{
-      display:flex; align-items:center; gap:12px; font-weight:700;
-      letter-spacing:.2px;
+    .bot {
+      align-self: flex-end;
+      background: #2ea043;
     }
-    .badge{
-      font-size:12px; padding:4px 10px; border-radius:999px;
-      background:linear-gradient(90deg, var(--accent), var(--accent-2));
-      color:#0b0f1c; font-weight:800;
+    .input-container {
+      display: flex;
+      padding: 10px;
+      background: #171a2b;
+      border-top: 1px solid #333;
     }
-    .controls{display:flex; gap:10px; align-items:center}
-    .btn{
-      appearance:none; border:none; cursor:pointer; font-weight:700;
-      padding:10px 14px; border-radius:14px; background:#1f2440; color:var(--text);
-      border:1px solid var(--border); transition:.15s transform ease, .15s background ease, .15s border ease;
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
     }
-    .btn:hover{transform:translateY(-1px); background:#242a4b}
-    .btn.primary{
-      background:linear-gradient(90deg, var(--accent), var(--accent-2));
-      color:#0b0f1c; border-color:transparent;
+    button {
+      margin-left: 10px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      background: #7c7cff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .main{
-      position:relative; flex:1; overflow:hidden;
-      border:1px solid var(--border); border-radius:22px; background:var(--panel);
-    }
-    iframe{
-      width:100%; height:100%; border:0; display:block; background:#0b0f1c;
-    }
-    .hint{
-      position:absolute; inset:auto 16px 16px 16px;
-      background:rgba(15, 18, 32, .8); border:1px dashed #364065; border-radius:16px;
-      padding:12px 14px; font-size:13px; color:var(--muted)
-    }
-    .footer{
-      text-align:center; font-size:12px; color:var(--muted);
-    }
-    @media (max-width:720px){
-      .shell{padding:12px}
-      .header{flex-wrap:wrap; gap:8px}
-      .title{width:100%; justify-content:space-between}
+    button:hover {
+      background: #5a5ad6;
     }
   </style>
 </head>
 <body>
-  <div class="shell" role="application" aria-label="رابط کاربری چت‌بات">
-    <div class="header">
-      <div class="title">
-        <span>چت‌بات متصل به Gradio</span>
-        <span class="badge">Live</span>
-      </div>
-      <div class="controls">
-        <button class="btn" id="reloadBtn" title="بارگذاری مجدد">بارگذاری مجدد</button>
-        <a class="btn primary" id="openBtn" href="https://2dd6ff85269637e013.gradio.live" target="_blank" rel="noopener">باز کردن در پنجره جدید</a>
-      </div>
-    </div>
 
-    <div class="main">
-      <!-- روش ۱: جاسازی مستقیم با iframe -->
-      <iframe id="gradioFrame"
-              title="Gradio Chatbot"
-              allow="clipboard-read; clipboard-write; microphone; camera; autoplay; fullscreen; cross-origin-isolated"
-              referrerpolicy="no-referrer"
-              src="https://2dd6ff85269637e013.gradio.live">
-      </iframe>
+  <div class="chat-container" id="chat"></div>
 
-      <!-- راهنمایی: اگر میزبان اجازه‌ی نمایش در iframe ندهد (X-Frame-Options/CSP)،
-           از دکمه «باز کردن در پنجره جدید» استفاده کنید یا روش ۲ را امتحان کنید. -->
-      <div class="hint">
-        اگر محتوای چت نمایش داده نشد، احتمالا میزبان اجازه‌ی نمایش داخل iframe را مسدود کرده است. در این صورت از دکمه «باز کردن در پنجره جدید» استفاده کنید.
-      </div>
-    </div>
-
-    <div class="footer">
-      نکته: برای عبور از محدودیت‌های مرورگر مثل CORS یا X-Frame-Options نمی‌توان در سمت کاربر تغییری داد. اگر نیاز به رندر داخل سایت خودتان دارید، یا از همین iframe استفاده کنید
-      یا روی سرور خودتان یک پروکسی امن راه‌اندازی کنید.
-    </div>
+  <div class="input-container">
+    <input type="text" id="userInput" placeholder="پیام خود را بنویسید..." />
+    <button onclick="sendMessage()">ارسال</button>
   </div>
 
   <script>
-    const reloadBtn = document.getElementById('reloadBtn');
-    const frame = document.getElementById('gradioFrame');
-    reloadBtn.addEventListener('click', () => {
-      // بارگذاری مجدد iframe بدون اسکرول مجدد صفحه
-      const src = frame.getAttribute('src');
-      frame.setAttribute('src', src);
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("userInput");
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.classList.add("msg", sender);
+      msg.innerText = text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      input.value = "";
+
+      try {
+        // اینجا باید endpoint درست سرور Gradio شما قرار بگیرد
+        const res = await fetch("https://2dd6ff85269637e013.gradio.live/run/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: [text] })
+        });
+
+        const data = await res.json();
+        console.log(data);
+
+        // جواب Gradio معمولا در data.data[0] برمی‌گردد
+        addMessage(data.data[0], "bot");
+
+      } catch (err) {
+        console.error(err);
+        addMessage("❌ خطا در اتصال به سرور", "bot");
+      }
+    }
+
+    // ارسال با Enter
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendMessage();
     });
   </script>
 
-  <!--
-  ──────────────────────────────────────────────────────────────────────────────
-  روش ۲ (اختیاری): استفاده از وب‌کامپوننت gradio-app
-  اگر CDN و CSP شما اجازه می‌دهد، می‌توانید اسکریپت زیر را فعال کنید
-  و به جای iframe از <gradio-app> استفاده کنید.
-
-  <script type="module" src="https://cdn.jsdelivr.net/npm/gradio@latest/dist/gradio.js"></script>
-  <gradio-app src="https://fdf983a8b151025985.gradio.live"></gradio-app>
-
-  توجه: اگر دامنه‌ی مقصد نمایش در iframe/web component را ممنوع کرده باشد،
-  هیچ روشی در سمت کلاینت محدودیت را «دور» نمی‌زند. در این حالت، یا باید از
-  «باز کردن در پنجره جدید» استفاده کنید یا یک پروکسی سمت سرور راه بیندازید.
-  ──────────────────────────────────────────────────────────────────────────────
-  -->
 </body>
 </html>
