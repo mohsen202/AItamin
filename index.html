@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>چت‌بات Gradio (Proxy)</title>
+  <title>چت‌بات Gradio (با Cloudflare Worker)</title>
   <style>
     body {margin:0;font-family:sans-serif;background:#0f1220;color:#fff;display:flex;flex-direction:column;height:100vh;}
     .chat-container {flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
-    .msg {max-width:70%;padding:10px 14px;border-radius:15px;line-height:1.5;}
+    .msg {max-width:70%;padding:10px 14px;border-radius:15px;line-height:1.5;white-space:pre-wrap;}
     .user {align-self:flex-start;background:#1f6feb;}
     .bot {align-self:flex-end;background:#2ea043;}
     .input-container {display:flex;padding:10px;background:#171a2b;border-top:1px solid #333;}
@@ -29,6 +29,9 @@
     const chat = document.getElementById("chat");
     const input = document.getElementById("userInput");
 
+    // ⚠️ اینجا آدرس Worker خودت رو بذار
+    const WORKER_URL = "https://dfd7160c6e0cfb15f6.gradio.live/chat";
+
     function addMessage(text, sender) {
       const msg = document.createElement("div");
       msg.classList.add("msg", sender);
@@ -44,21 +47,27 @@
       input.value = "";
 
       try {
-        const res = await fetch("https://patient-resonance-22e7.mgh2023.workers.dev/chat", {
+        const res = await fetch(WORKER_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: [text] })
         });
 
-        const data = await res.json();
-        if (data?.data?.[0]) {
-          addMessage(data.data[0], "bot");
-        } else {
-          addMessage("❌ جواب نامعتبر از سرور", "bot");
+        if (!res.ok) {
+          addMessage("❌ سرور پاسخ نامعتبر داد", "bot");
+          return;
         }
+
+        const data = await res.json();
+        console.log("Server response:", data);
+
+        // در Gradio جواب معمولا در data.data[0] هست
+        const botReply = data?.data?.[0] ?? "❌ پاسخ خالی از سرور";
+        addMessage(botReply, "bot");
+
       } catch (err) {
-        console.error(err);
-        addMessage("❌ خطا در اتصال به سرور", "bot");
+        console.error("Fetch error:", err);
+        addMessage("❌ خطا در اتصال به Worker", "bot");
       }
     }
 
