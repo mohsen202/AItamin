@@ -1,139 +1,141 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>چت‌بات من — متصل به Gradio (با پروکسی CORS)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        #chat-box {
-            height: 400px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow-y: scroll;
-            background: white;
-            margin-bottom: 10px;
-            border-radius: 8px;
-        }
-        .user-msg {
-            text-align: left;
-            color: #007bff;
-            margin: 5px 0;
-            font-weight: bold;
-        }
-        .bot-msg {
-            text-align: right;
-            color: #28a745;
-            margin: 5px 0;
-        }
-        #user-input {
-            width: 70%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            padding: 8px 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>چت‌بات – اتصال به Gradio</title>
+  <style>
+    :root{
+      --bg:#0f1220;
+      --panel:#171a2b;
+      --text:#e9ecf1;
+      --muted:#9aa4b2;
+      --accent:#7c7cff;
+      --accent-2:#00e0a4;
+      --border:#252942;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:radial-gradient(1200px 800px at 10% -10%, #23284a 0%, transparent 60%),
+               radial-gradient(1000px 700px at 110% 10%, #1b2040 0%, transparent 55%),
+               var(--bg);
+      color:var(--text); font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Segoe UI Emoji";
+      display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .shell{
+      width: min(1200px, 100%);
+      height: min(820px, calc(100vh - 48px));
+      display:flex; flex-direction:column; gap:14px;
+      padding:16px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--border); border-radius:28px; box-shadow:var(--shadow); backdrop-filter: blur(8px);
+    }
+    .header{
+      display:flex; align-items:center; gap:12px; justify-content:space-between;
+      padding:12px 14px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    }
+    .title{
+      display:flex; align-items:center; gap:12px; font-weight:700;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size:12px; padding:4px 10px; border-radius:999px;
+      background:linear-gradient(90deg, var(--accent), var(--accent-2));
+      color:#0b0f1c; font-weight:800;
+    }
+    .controls{display:flex; gap:10px; align-items:center}
+    .btn{
+      appearance:none; border:none; cursor:pointer; font-weight:700;
+      padding:10px 14px; border-radius:14px; background:#1f2440; color:var(--text);
+      border:1px solid var(--border); transition:.15s transform ease, .15s background ease, .15s border ease;
+    }
+    .btn:hover{transform:translateY(-1px); background:#242a4b}
+    .btn.primary{
+      background:linear-gradient(90deg, var(--accent), var(--accent-2));
+      color:#0b0f1c; border-color:transparent;
+    }
+    .main{
+      position:relative; flex:1; overflow:hidden;
+      border:1px solid var(--border); border-radius:22px; background:var(--panel);
+    }
+    iframe{
+      width:100%; height:100%; border:0; display:block; background:#0b0f1c;
+    }
+    .hint{
+      position:absolute; inset:auto 16px 16px 16px;
+      background:rgba(15, 18, 32, .8); border:1px dashed #364065; border-radius:16px;
+      padding:12px 14px; font-size:13px; color:var(--muted)
+    }
+    .footer{
+      text-align:center; font-size:12px; color:var(--muted);
+    }
+    @media (max-width:720px){
+      .shell{padding:12px}
+      .header{flex-wrap:wrap; gap:8px}
+      .title{width:100%; justify-content:space-between}
+    }
+  </style>
 </head>
 <body>
+  <div class="shell" role="application" aria-label="رابط کاربری چت‌بات">
+    <div class="header">
+      <div class="title">
+        <span>چت‌بات متصل به Gradio</span>
+        <span class="badge">Live</span>
+      </div>
+      <div class="controls">
+        <button class="btn" id="reloadBtn" title="بارگذاری مجدد">بارگذاری مجدد</button>
+        <a class="btn primary" id="openBtn" href="https://fdf983a8b151025985.gradio.live" target="_blank" rel="noopener">باز کردن در پنجره جدید</a>
+      </div>
+    </div>
 
-    <h2>🤖 چت‌بات هوشمند (با پروکسی CORS)</h2>
-    <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="پیام خود را بنویسید..." autocomplete="off" />
-    <button onclick="sendMessage()">ارسال</button>
+    <div class="main">
+      <!-- روش ۱: جاسازی مستقیم با iframe -->
+      <iframe id="gradioFrame"
+              title="Gradio Chatbot"
+              allow="clipboard-read; clipboard-write; microphone; camera; autoplay; fullscreen; cross-origin-isolated"
+              referrerpolicy="no-referrer"
+              src="https://fdf983a8b151025985.gradio.live">
+      </iframe>
 
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        let chatHistory = [];
+      <!-- راهنمایی: اگر میزبان اجازه‌ی نمایش در iframe ندهد (X-Frame-Options/CSP)،
+           از دکمه «باز کردن در پنجره جدید» استفاده کنید یا روش ۲ را امتحان کنید. -->
+      <div class="hint">
+        اگر محتوای چت نمایش داده نشد، احتمالا میزبان اجازه‌ی نمایش داخل iframe را مسدود کرده است. در این صورت از دکمه «باز کردن در پنجره جدید» استفاده کنید.
+      </div>
+    </div>
 
-        function appendMessage(message, isUser = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = isUser ? 'user-msg' : 'bot-msg';
-            msgDiv.textContent = message;
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+    <div class="footer">
+      نکته: برای عبور از محدودیت‌های مرورگر مثل CORS یا X-Frame-Options نمی‌توان در سمت کاربر تغییری داد. اگر نیاز به رندر داخل سایت خودتان دارید، یا از همین iframe استفاده کنید
+      یا روی سرور خودتان یک پروکسی امن راه‌اندازی کنید.
+    </div>
+  </div>
 
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
+  <script>
+    const reloadBtn = document.getElementById('reloadBtn');
+    const frame = document.getElementById('gradioFrame');
+    reloadBtn.addEventListener('click', () => {
+      // بارگذاری مجدد iframe بدون اسکرول مجدد صفحه
+      const src = frame.getAttribute('src');
+      frame.setAttribute('src', src);
+    });
+  </script>
 
-            appendMessage(message, true);
-            userInput.value = '';
-            const thinkingElement = document.createElement('div');
-            thinkingElement.className = 'bot-msg';
-            thinkingElement.textContent = "در حال پاسخ دادن...";
-            chatBox.appendChild(thinkingElement);
+  <!--
+  ──────────────────────────────────────────────────────────────────────────────
+  روش ۲ (اختیاری): استفاده از وب‌کامپوننت gradio-app
+  اگر CDN و CSP شما اجازه می‌دهد، می‌توانید اسکریپت زیر را فعال کنید
+  و به جای iframe از <gradio-app> استفاده کنید.
 
-            // 🔄 استفاده از پروکسی CORS
-            const targetUrl = 'https://b543ec72cc7961e714.gradio.live/api/predict/';
-            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+  <script type="module" src="https://cdn.jsdelivr.net/npm/gradio@latest/dist/gradio.js"></script>
+  <gradio-app src="https://fdf983a8b151025985.gradio.live"></gradio-app>
 
-            try {
-                const response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        "data": [message, chatHistory],
-                        "fn_index": 0
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                chatBox.removeChild(thinkingElement);
-
-                if (result.data && result.data[0]) {
-                    const botReply = result.data[0];
-                    appendMessage(botReply, false);
-
-                    if (result.data[1]) {
-                        chatHistory = result.data[1];
-                    } else {
-                        chatHistory.push([message, botReply]);
-                    }
-                } else {
-                    appendMessage("⚠️ پاسخی از سرور دریافت نشد.", false);
-                }
-
-            } catch (error) {
-                if (chatBox.contains(thinkingElement)) {
-                    chatBox.removeChild(thinkingElement);
-                }
-                appendMessage("❌ خطا: " + error.message, false);
-                console.error("Error:", error);
-            }
-        }
-
-        userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-
-        appendMessage("سلام! من ربات هوشمند شما هستم. چطور می‌تونم کمکتون کنم؟", false);
-    </script>
-
+  توجه: اگر دامنه‌ی مقصد نمایش در iframe/web component را ممنوع کرده باشد،
+  هیچ روشی در سمت کلاینت محدودیت را «دور» نمی‌زند. در این حالت، یا باید از
+  «باز کردن در پنجره جدید» استفاده کنید یا یک پروکسی سمت سرور راه بیندازید.
+  ──────────────────────────────────────────────────────────────────────────────
+  -->
 </body>
 </html>
