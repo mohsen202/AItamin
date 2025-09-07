@@ -3,65 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>چت‌بات Gradio</title>
+  <title>چت‌بات Gradio (Proxy)</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f1220;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    .chat-container {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .msg {
-      max-width: 70%;
-      padding: 10px 14px;
-      border-radius: 15px;
-      line-height: 1.5;
-    }
-    .user {
-      align-self: flex-start;
-      background: #1f6feb;
-    }
-    .bot {
-      align-self: flex-end;
-      background: #2ea043;
-    }
-    .input-container {
-      display: flex;
-      padding: 10px;
-      background: #171a2b;
-      border-top: 1px solid #333;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-    }
-    button {
-      margin-left: 10px;
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      background: #7c7cff;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #5a5ad6;
-    }
+    body {margin:0;font-family:sans-serif;background:#0f1220;color:#fff;display:flex;flex-direction:column;height:100vh;}
+    .chat-container {flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+    .msg {max-width:70%;padding:10px 14px;border-radius:15px;line-height:1.5;}
+    .user {align-self:flex-start;background:#1f6feb;}
+    .bot {align-self:flex-end;background:#2ea043;}
+    .input-container {display:flex;padding:10px;background:#171a2b;border-top:1px solid #333;}
+    input {flex:1;padding:10px;border:none;border-radius:8px;outline:none;}
+    button {margin-left:10px;padding:10px 18px;border:none;border-radius:8px;background:#7c7cff;color:#fff;font-weight:bold;cursor:pointer;}
+    button:hover {background:#5a5ad6;}
   </style>
 </head>
 <body>
@@ -92,33 +44,24 @@
       input.value = "";
 
       try {
-        // استفاده از cors-anywhere برای عبور از CORS
-        const proxy = "https://cors-anywhere.herokuapp.com/";
-        const gradioURL = "https://2dd6ff85269637e013.gradio.live/run/predict";
-
-        const res = await fetch(proxy + gradioURL, {
+        const res = await fetch("https://patient-resonance-22e7.mgh2023.workers.dev/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: [text] })
         });
 
         const data = await res.json();
-        console.log(data);
-
-        // معمولا جواب در data.data[0] قرار می‌گیره
         if (data?.data?.[0]) {
           addMessage(data.data[0], "bot");
         } else {
           addMessage("❌ جواب نامعتبر از سرور", "bot");
         }
-
       } catch (err) {
         console.error(err);
         addMessage("❌ خطا در اتصال به سرور", "bot");
       }
     }
 
-    // ارسال با Enter
     input.addEventListener("keydown", e => {
       if (e.key === "Enter") sendMessage();
     });
