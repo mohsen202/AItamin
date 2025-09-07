@@ -92,8 +92,11 @@
       input.value = "";
 
       try {
-        // اینجا باید endpoint درست سرور Gradio شما قرار بگیرد
-        const res = await fetch("https://2dd6ff85269637e013.gradio.live/run/predict", {
+        // استفاده از cors-anywhere برای عبور از CORS
+        const proxy = "https://cors-anywhere.herokuapp.com/";
+        const gradioURL = "https://2dd6ff85269637e013.gradio.live/run/predict";
+
+        const res = await fetch(proxy + gradioURL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: [text] })
@@ -102,8 +105,12 @@
         const data = await res.json();
         console.log(data);
 
-        // جواب Gradio معمولا در data.data[0] برمی‌گردد
-        addMessage(data.data[0], "bot");
+        // معمولا جواب در data.data[0] قرار می‌گیره
+        if (data?.data?.[0]) {
+          addMessage(data.data[0], "bot");
+        } else {
+          addMessage("❌ جواب نامعتبر از سرور", "bot");
+        }
 
       } catch (err) {
         console.error(err);
