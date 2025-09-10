@@ -1,221 +1,167 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>اولین مدل زبانی هوش مصنوعی تامین</title>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>چت با مدل هوش مصنوعی - Neon Typing</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
     body {
-      font-family: 'Vazir', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background: linear-gradient(135deg, #E6E6FA, #F4E1C4); /* Lavender + Cream */
-      color: #333;
-      direction: rtl;
+        font-family: 'Orbitron', sans-serif;
+        background: #0f0f0f;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
     }
-    #chat-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: rgba(230,230,250,0.9); /* Lavender */
-      border-radius: 0 0 20px 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
-      color: #4B0082;
+    .chat-container {
+        width: 90%;
+        max-width: 600px;
+        background: #111;
+        border: 2px solid #0ff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 0 20px #0ff;
+        display: flex;
+        flex-direction: column;
     }
-    #ai-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: url('https://s32.picofile.com/file/8481217200/3.png') center/cover no-repeat;
-      animation: pulse 2s infinite, moveUpDown 3s infinite;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      margin: 0 20px;
-    }
-    @keyframes pulse {0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-    @keyframes moveUpDown {0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
-    #chat-container {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: rgba(255,255,255,0.8);
-      margin: 10px;
-      border-radius: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
+    .messages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        padding-right: 5px;
     }
     .message {
-      margin: 10px 0;
-      padding: 12px 15px;
-      border-radius: 15px;
-      max-width: 80%;
-      font-size: 14px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      animation: fadeIn 0.3s ease;
+        margin: 5px 0;
+        padding: 10px 15px;
+        border-radius: 12px;
+        max-width: 80%;
+        word-wrap: break-word;
+        position: relative;
+        animation: fadeIn 0.3s ease-in-out;
     }
-    .user { background: #A3B18A; color: #fff; text-align: right; align-self: flex-end; }
-    .bot { background: #D08C60; color: #fff; text-align: left; align-self: flex-start; }
-    #input-container {
-      display: flex;
-      padding: 10px;
-      background: rgba(230,230,250,0.9);
-      margin: 10px;
-      border-radius: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      backdrop-filter: blur(10px);
+    .user {
+        background: #ff00ff;
+        align-self: flex-end;
+        box-shadow: 0 0 10px #ff00ff;
     }
-    #input-text {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 15px;
-      margin-right: 10px;
-      background: #F4E1C4;
-      color: #333;
-      font-size: 14px;
-      outline: none;
+    .bot {
+        background: #00ffff;
+        align-self: flex-start;
+        box-shadow: 0 0 10px #00ffff;
     }
-    #send-button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 15px;
-      background: #FF6F61;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.3s;
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(10px);}
+        to {opacity: 1; transform: translateY(0);}
     }
-    #send-button:hover { background: #e05a50; }
-    #suggestions-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px;
-      background: rgba(244,225,196,0.85);
-      margin: 10px;
-      border-radius: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      justify-content: center;
-      backdrop-filter: blur(10px);
+    .input-area {
+        display: flex;
     }
-    .suggestion-button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 15px;
-      background: #F4E1C4;
-      color: #4B0082;
-      cursor: pointer;
-      transition: background 0.3s;
+    input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px 0 0 12px;
+        border: none;
+        background: #222;
+        color: #0ff;
+        outline: none;
+        font-size: 16px;
     }
-    .suggestion-button:hover {
-      background: #A3B18A;
-      color: #fff;
+    button {
+        padding: 0 20px;
+        border: none;
+        border-radius: 0 12px 12px 0;
+        background: #0ff;
+        color: #111;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
     }
-    .loading-container {
-      display: none;
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      text-align: center;
+    button:hover {
+        background: #0aa;
     }
-    .loading-spinner {
-      width: 30px; height: 30px;
-      border: 4px solid #FF6F61;
-      border-top: 4px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
+    .typing {
+        font-style: italic;
+        color: #0ff;
+        margin: 5px 0;
+        animation: blink 1s infinite;
     }
-    @keyframes spin {0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-    @keyframes fadeIn {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  </style>
+    @keyframes blink {
+        0%, 50%, 100% { opacity: 1; }
+        25%, 75% { opacity: 0.3; }
+    }
+</style>
 </head>
 <body>
-  <div id="chat-header">
-    <div class="left-text">نسخه آزمایشی</div>
-    <div id="ai-avatar"></div>
-    <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
-  </div>
-
-  <div id="chat-container">
-    <div class="loading-container" id="loading-container">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">لطفا شکیبا باشید...</div>
+<div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="پیام خود را بنویسید...">
+        <button onclick="sendMessage()">ارسال</button>
     </div>
-  </div>
+</div>
 
-  <div id="suggestions-container">
-    <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
-    <button class="suggestion-button" data-question="بیمه زنان خانه دار چیه؟">بیمه زنان خانه دار چیه؟</button>
-    <button class="suggestion-button" data-question="هدف از ارسال پیامک ماهانه چیه؟">هدف از ارسال پیامک ماهانه چیه؟</button>
-  </div>
+<script>
+let typingDiv = null;
 
-  <div id="input-container">
-    <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
-    <button id="send-button">ارسال</button>
-  </div>
+// آدرس سرور جدید
+const SERVER_URL = "https://motivation-du-complaints-copyright.trycloudflare.com/chat";
 
-  <script type="module">
-    import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
-    const chatContainer=document.getElementById('chat-container');
-    const inputText=document.getElementById('input-text');
-    const sendButton=document.getElementById('send-button');
-    const loadingContainer=document.getElementById('loading-container');
-    const suggestionButtons=document.querySelectorAll('.suggestion-button');
+async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (!message) return;
 
-    // آدرس Gradio از طریق Cloudflare Tunnel
-    const gradioUrl="https://effects-reads-respondent-regulation.trycloudflare.com/";
+    appendMessage(message, "user");
+    input.value = "";
 
-    let client=null;
+    // اضافه کردن پیام در حال تایپ کردن
+    typingDiv = document.createElement("div");
+    typingDiv.className = "message bot typing";
+    typingDiv.textContent = "در حال تایپ کردن...";
+    document.getElementById("messages").appendChild(typingDiv);
+    scrollToBottom();
 
-    async function connectToGradio(){
-      try{
-        if(!client){
-          client=await Client.connect(gradioUrl);
-        }
-        return client;
-      }catch(e){
-        console.error(e);
-        addMessage("❌ خطا در اتصال به سرور هوش مصنوعی",'bot');
-        return null;
-      }
+    try {
+        const response = await fetch(SERVER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        if (!response.ok) throw new Error("خطا در پاسخ سرور");
+
+        const data = await response.json();
+
+        // حذف typing indicator و اضافه کردن پاسخ واقعی
+        typingDiv.remove();
+        appendMessage(data.response, "bot");
+    } catch (error) {
+        if (typingDiv) typingDiv.remove();
+        appendMessage("❌ خطا در اتصال به سرور!", "bot");
+        console.error(error);
     }
+}
 
-    function addMessage(text,sender){
-      const m=document.createElement('div');
-      m.classList.add('message',sender);
-      m.textContent=text;
-      chatContainer.appendChild(m);
-      chatContainer.scrollTop=chatContainer.scrollHeight;
-    }
+function appendMessage(text, type) {
+    const messagesDiv = document.getElementById("messages");
+    const messageDiv = document.createElement("div");
+    messageDiv.className = `message ${type}`;
+    messageDiv.textContent = text;
+    messagesDiv.appendChild(messageDiv);
+    scrollToBottom();
+}
 
-    async function sendMessage(message){
-      const userMessage=message||inputText.value.trim();
-      if(!userMessage) return;
-      addMessage(userMessage,'user');
-      inputText.value='';
-      loadingContainer.style.display='block';
-      try{
-        const client=await connectToGradio();
-        if(!client) return;
-        // ⚠️ اگر فانکشن شما اسم دیگری غیر از "/predict" دارد، اینجا باید تغییر دهید
-        const result=await client.predict("/predict",{input_text:userMessage});
-        addMessage(result.data[0],'bot');
-      }catch(e){
-        console.error(e);
-        addMessage("⚠️ خطا در ارتباط با سرور هوش مصنوعی",'bot');
-      }finally{
-        loadingContainer.style.display='none';
-      }
-    }
+function scrollToBottom() {
+    const messagesDiv = document.getElementById("messages");
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
-    sendButton.addEventListener('click',()=>sendMessage());
-    inputText.addEventListener('keypress',(e)=>{if(e.key==='Enter')sendMessage()});
-    suggestionButtons.forEach(b=>b.addEventListener('click',()=>sendMessage(b.getAttribute('data-question'))));
-  </script>
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") sendMessage();
+});
+</script>
 </body>
 </html>
