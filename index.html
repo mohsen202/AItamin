@@ -106,8 +106,8 @@
 <script>
 let typingDiv = null;
 
-// آدرس سرور جدید
-const SERVER_URL = "https://deadline-using-albums-loop.trycloudflare.com/chat";
+// آدرس سرور جدید Gradio
+const SERVER_URL = "https://motivation-du-complaints-copyright.trycloudflare.com/predict";
 
 async function sendMessage() {
     const input = document.getElementById("userInput");
@@ -117,7 +117,7 @@ async function sendMessage() {
     appendMessage(message, "user");
     input.value = "";
 
-    // اضافه کردن پیام در حال تایپ کردن
+    // نمایش پیام تایپینگ
     typingDiv = document.createElement("div");
     typingDiv.className = "message bot typing";
     typingDiv.textContent = "در حال تایپ کردن...";
@@ -125,22 +125,27 @@ async function sendMessage() {
     scrollToBottom();
 
     try {
+        // درخواست POST استاندارد Gradio
         const response = await fetch(SERVER_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({
+                data: [message]
+            })
         });
 
-        if (!response.ok) throw new Error("خطا در پاسخ سرور");
+        if (!response.ok) throw new Error(`خطا: ${response.status} ${response.statusText}`);
 
         const data = await response.json();
 
-        // حذف typing indicator و اضافه کردن پاسخ واقعی
+        // Gradio پاسخ را در data.data[0] قرار می‌دهد
+        const botReply = data?.data?.[0] || "⚠️ پاسخ خالی از سرور دریافت شد";
+
         typingDiv.remove();
-        appendMessage(data.response, "bot");
+        appendMessage(botReply, "bot");
     } catch (error) {
         if (typingDiv) typingDiv.remove();
-        appendMessage("❌ خطا در اتصال به سرور!", "bot");
+        appendMessage("❌ خطا در اتصال به سرور یا CORS!", "bot");
         console.error(error);
     }
 }
