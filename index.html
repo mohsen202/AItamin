@@ -1,80 +1,213 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>چت‌بات Gradio (با Cloudflare Worker)</title>
+  <title>اولین مدل زبانی هوش مصنوعی تامین</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" type="text/css" />
   <style>
-    body {margin:0;font-family:sans-serif;background:#0f1220;color:#fff;display:flex;flex-direction:column;height:100vh;}
-    .chat-container {flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
-    .msg {max-width:70%;padding:10px 14px;border-radius:15px;line-height:1.5;white-space:pre-wrap;}
-    .user {align-self:flex-start;background:#1f6feb;}
-    .bot {align-self:flex-end;background:#2ea043;}
-    .input-container {display:flex;padding:10px;background:#171a2b;border-top:1px solid #333;}
-    input {flex:1;padding:10px;border:none;border-radius:8px;outline:none;}
-    button {margin-left:10px;padding:10px 18px;border:none;border-radius:8px;background:#7c7cff;color:#fff;font-weight:bold;cursor:pointer;}
-    button:hover {background:#5a5ad6;}
+    body {
+      font-family: 'Vazir', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(135deg, #E6E6FA, #F4E1C4); /* Lavender + Cream */
+      color: #333;
+      direction: rtl;
+    }
+    #chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(230,230,250,0.9); /* Lavender */
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+      color: #4B0082;
+    }
+    #ai-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: url('https://s32.picofile.com/file/8481217200/3.png') center/cover no-repeat;
+      animation: pulse 2s infinite, moveUpDown 3s infinite;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      margin: 0 20px;
+    }
+    @keyframes pulse {0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+    @keyframes moveUpDown {0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+    #chat-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.8);
+      margin: 10px;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
+    .message {
+      margin: 10px 0;
+      padding: 12px 15px;
+      border-radius: 15px;
+      max-width: 80%;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease;
+    }
+    .user { background: #A3B18A; color: #fff; text-align: right; align-self: flex-end; }
+    .bot { background: #D08C60; color: #fff; text-align: left; align-self: flex-start; }
+    #input-container {
+      display: flex;
+      padding: 10px;
+      background: rgba(230,230,250,0.9);
+      margin: 10px;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
+    #input-text {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 15px;
+      margin-right: 10px;
+      background: #F4E1C4;
+      color: #333;
+      font-size: 14px;
+      outline: none;
+    }
+    #send-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 15px;
+      background: #FF6F61;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #send-button:hover { background: #e05a50; }
+    #suggestions-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background: rgba(244,225,196,0.85);
+      margin: 10px;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+    .suggestion-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 15px;
+      background: #F4E1C4;
+      color: #4B0082;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .suggestion-button:hover {
+      background: #A3B18A;
+      color: #fff;
+    }
+    .loading-container {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+    }
+    .loading-spinner {
+      width: 30px; height: 30px;
+      border: 4px solid #FF6F61;
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    @keyframes fadeIn {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
-
-  <div class="chat-container" id="chat"></div>
-
-  <div class="input-container">
-    <input type="text" id="userInput" placeholder="پیام خود را بنویسید..." />
-    <button onclick="sendMessage()">ارسال</button>
+  <div id="chat-header">
+    <div class="left-text">نسخه آزمایشی</div>
+    <div id="ai-avatar"></div>
+    <div class="right-text">اولین مدل زبانی هوش مصنوعی تامین</div>
   </div>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("userInput");
+  <div id="chat-container">
+    <div class="loading-container" id="loading-container">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">لطفا شکیبا باشید...</div>
+    </div>
+  </div>
 
-    // ⚠️ اینجا آدرس Worker خودت رو بذار
-    const WORKER_URL = "https://patient-resonance-22e7.mgh2023.workers.dev";
+  <div id="suggestions-container">
+    <button class="suggestion-button" data-question="بیمه دانشجویان چگونه قرارداد ببندم؟">بیمه دانشجویان چگونه قرارداد ببندم؟</button>
+    <button class="suggestion-button" data-question="بیمه زنان خانه دار چیه؟">بیمه زنان خانه دار چیه؟</button>
+    <button class="suggestion-button" data-question="هدف از ارسال پیامک ماهانه چیه؟">هدف از ارسال پیامک ماهانه چیه؟</button>
+  </div>
 
-    function addMessage(text, sender) {
-      const msg = document.createElement("div");
-      msg.classList.add("msg", sender);
-      msg.innerText = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-    }
+  <div id="input-container">
+    <input type="text" id="input-text" placeholder="سوال خود را بنویسید..." />
+    <button id="send-button">ارسال</button>
+  </div>
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage(text, "user");
-      input.value = "";
+  <script type="module">
+    import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@latest/dist/index.min.js";
+    const chatContainer=document.getElementById('chat-container');
+    const inputText=document.getElementById('input-text');
+    const sendButton=document.getElementById('send-button');
+    const loadingContainer=document.getElementById('loading-container');
+    const suggestionButtons=document.querySelectorAll('.suggestion-button');
 
-      try {
-        const res = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: [text] })
-        });
+    // لینک مستقیم Gradio
+    const gradioUrl="https://effects-reads-respondent-regulation.trycloudflare.com";
 
-        if (!res.ok) {
-          addMessage("❌ سرور پاسخ نامعتبر داد", "bot");
-          return;
-        }
-
-        const data = await res.json();
-        console.log("Server response:", data);
-
-        // در Gradio جواب معمولا در data.data[0] هست
-        const botReply = data?.data?.[0] ?? "❌ پاسخ خالی از سرور";
-        addMessage(botReply, "bot");
-
-      } catch (err) {
-        console.error("Fetch error:", err);
-        addMessage("❌ خطا در اتصال به Worker", "bot");
+    async function connectToGradio(){
+      try{
+        return await Client.connect(gradioUrl);
+      }catch(e){
+        addMessage("خطا در اتصال به سرور هوش مصنوعی",'bot');
+        return null;
       }
     }
 
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") sendMessage();
-    });
-  </script>
+    function addMessage(text,sender){
+      const m=document.createElement('div');
+      m.classList.add('message',sender);
+      m.textContent=text;
+      chatContainer.appendChild(m);
+      chatContainer.scrollTop=chatContainer.scrollHeight;
+    }
 
+    async function sendMessage(message){
+      const userMessage=message||inputText.value.trim();
+      if(!userMessage) return;
+      addMessage(userMessage,'user');
+      inputText.value='';
+      loadingContainer.style.display='block';
+      try{
+        const client=await connectToGradio();
+        if(!client) return;
+        const result=await client.predict("/predict",{input_text:userMessage});
+        addMessage(result.data[0],'bot');
+      }catch(e){
+        addMessage("خطا در ارتباط با سرور هوش مصنوعی",'bot');
+      }finally{
+        loadingContainer.style.display='none';
+      }
+    }
+
+    sendButton.addEventListener('click',()=>sendMessage());
+    inputText.addEventListener('keypress',(e)=>{if(e.key==='Enter')sendMessage()});
+    suggestionButtons.forEach(b=>b.addEventListener('click',()=>sendMessage(b.getAttribute('data-question'))));
+  </script>
 </body>
 </html>
