@@ -167,14 +167,20 @@
     const loadingContainer=document.getElementById('loading-container');
     const suggestionButtons=document.querySelectorAll('.suggestion-button');
 
-    // لینک مستقیم Gradio
-    const gradioUrl="https://effects-reads-respondent-regulation.trycloudflare.com";
+    // آدرس Gradio از طریق Cloudflare Tunnel
+    const gradioUrl="https://effects-reads-respondent-regulation.trycloudflare.com/";
+
+    let client=null;
 
     async function connectToGradio(){
       try{
-        return await Client.connect(gradioUrl);
+        if(!client){
+          client=await Client.connect(gradioUrl);
+        }
+        return client;
       }catch(e){
-        addMessage("خطا در اتصال به سرور هوش مصنوعی",'bot');
+        console.error(e);
+        addMessage("❌ خطا در اتصال به سرور هوش مصنوعی",'bot');
         return null;
       }
     }
@@ -196,10 +202,12 @@
       try{
         const client=await connectToGradio();
         if(!client) return;
+        // ⚠️ اگر فانکشن شما اسم دیگری غیر از "/predict" دارد، اینجا باید تغییر دهید
         const result=await client.predict("/predict",{input_text:userMessage});
         addMessage(result.data[0],'bot');
       }catch(e){
-        addMessage("خطا در ارتباط با سرور هوش مصنوعی",'bot');
+        console.error(e);
+        addMessage("⚠️ خطا در ارتباط با سرور هوش مصنوعی",'bot');
       }finally{
         loadingContainer.style.display='none';
       }
